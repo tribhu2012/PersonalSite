@@ -1,0 +1,147 @@
+@import "tailwindcss";
+
+/* ── Tokens ──────────────────────────────────────────────────
+   Hero is a full-bleed warm gradient (golden hour), deliberately
+   off the purple/blue/green of the reference. Black bold sans on
+   top, sticker buttons with hard offset shadows.
+   ──────────────────────────────────────────────────────────── */
+@theme {
+  --color-cream: #fdfaf7;
+  /* Alternating section tone — a cool slate rather than a warm beige, so the
+     bands read crisp and the white cards keep a clear edge. Deliberately
+     cool: it contrasts the warm hero instead of muddying against it. */
+  --color-band: #f1f5f9;
+  --color-navy: #1b2a47;
+  --color-pencil: #5c5c5c;
+
+  /* Accent for the punctuation dots in the headline. */
+  --color-dot: #14b8a6;
+
+  /* Section headings: marker swipe behind the word, periwinkle prose links. */
+  --color-mint: #86efac;
+  --color-link: #6f6ff0;
+
+  /* Blog titles set in a serif, editorial-style. System stack, so no extra
+     font request — swap for a webfont if you want more character. */
+  --font-serif: Georgia, 'Times New Roman', serif;
+
+  /* Sticky notes. */
+  --color-note-yellow: #fdf0b4;
+  --color-note-pink: #ffd8cd;
+  --color-note-blue: #d3e9fb;
+  --color-note-card: #fffdf8;
+  --color-tape: #f0dfa8;
+}
+
+/* Faint ruled lines for the pinned interests card. */
+.ruled {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(27, 42, 71, 0) 0,
+    rgba(27, 42, 71, 0) 27px,
+    rgba(27, 42, 71, 0.09) 27px,
+    rgba(27, 42, 71, 0.09) 28px
+  );
+}
+
+/* The hero backdrop. Radial gold bloom top-right over a warm
+   coral-to-rose sweep, so it reads light enough for black text. */
+/* Mint marker swipe behind heading text. A background gradient rather than an
+   absolute bar, so a heading that wraps gets a swipe under EACH line instead
+   of one bar spanning the whole block. */
+.swipe {
+  background-image: linear-gradient(to top, var(--color-mint) 0.3em, rgba(0, 0, 0, 0) 0.3em);
+  padding-right: 0.14em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* A whisper of the hero gradient on the inner sections so they don't read as
+   flat bands. Alternating corners keeps it from feeling like a repeated
+   stamp. Kept low-alpha — this should be felt, not seen. */
+.tint-tr {
+  background-image: radial-gradient(58% 46% at 100% 0%, rgba(255, 154, 139, 0.17), rgba(255, 154, 139, 0) 72%);
+}
+
+/* Cool bloom for the slate bands. A warm gold one here would put the beige
+   cast straight back onto the colour the slate is there to avoid. */
+.tint-bl {
+  background-image: radial-gradient(58% 46% at 0% 100%, rgba(125, 180, 214, 0.22), rgba(125, 180, 214, 0) 72%);
+}
+
+.hero-gradient {
+  background-image:
+    radial-gradient(circle at 84% 6%, #ffd76b 0%, rgba(255, 215, 107, 0) 46%),
+    radial-gradient(circle at 8% 92%, #ffb37a 0%, rgba(255, 179, 122, 0) 40%),
+    linear-gradient(135deg, #ffc978 0%, #ff9a8b 44%, #ee7ba0 100%);
+}
+
+:root {
+  font-family: Inter, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: #0f172a;
+  background-color: #fdfaf7;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* "proximity", not "mandatory" — sections that outgrow a short viewport
+     still scroll freely instead of trapping the reader. */
+  scroll-snap-type: y proximity;
+}
+
+/* One section = one screen. min-height (not height) so long content on a
+   small viewport can still grow past the fold rather than clipping. */
+.screen {
+  min-height: 100svh;
+  scroll-snap-align: start;
+  display: flex;
+  align-items: center;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: #fdfaf7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Loading screen — the boxed name blinks its dot until the page
+   is ready, then the whole overlay fades out. */
+@keyframes dot-blink {
+  0%,
+  45% {
+    opacity: 1;
+  }
+  55%,
+  100% {
+    opacity: 0.15;
+  }
+}
+
+.dot-blink {
+  animation: dot-blink 1s steps(1, end) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .dot-blink {
+    animation: none;
+  }
+}
