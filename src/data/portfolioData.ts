@@ -73,30 +73,24 @@ export const hero = {
  * About reads as prose, so each paragraph is a list of chunks: a plain
  * string, or a { label, href } that renders as an inline link.
  *
- * The four numbers that used to sit in `highlights` tiles (12+ clients,
- * 30% workload, 50% response, 6 interns) are written into these
- * sentences instead — the tiles are gone, the facts aren't.
+ * The 12+ banking clients figure that used to sit in a `highlights` tile
+ * is written into the first paragraph instead — the tiles are gone, the
+ * fact isn't.
  */
 export const about = {
   heading: 'About',
   /* Kept to three paragraphs so the section still fits one screen. */
   body: [
     [
-      'Engineer by training, project manager by trade. I lead fintech delivery at CityTech Group, shipping products across 12+ banking clients from planning through to production.',
+      "My career began in engineering, but I was quickly drawn to project and product delivery, where technology meets strategy and execution. Since then I've led fintech initiatives across 12+ banking clients, taking products from planning to production with cross-functional teams.",
     ],
     [
-      'My instinct is to turn messy manual work into something measurable. I rebuilt our live-issue pipeline as automation across Jira and GitHub, 30% less operational workload, client response times halved, then stood up the company PMO from scratch and onboarded 6 interns into it.',
+      "I'm passionate about improving how organisations operate: automating workflows across Jira and GitHub, establishing a Project Management Office from the ground up, mentoring early-career professionals. The through-line is building systems that are scalable, efficient, and driven by data.",
     ],
     [
-      'Alongside the day job I teach software engineering and project management in Kathmandu, and before that I built autonomous robots in South Korea. I write on ',
-      { label: 'Medium', href: 'https://medium.com/@tribhuwanbhatt7' },
-      ', post on ',
-      { label: 'LinkedIn', href: 'https://www.linkedin.com/in/tribbhatt/' },
-      ', keep code on ',
-      { label: 'GitHub', href: 'https://github.com/Tribhuwan-Bhatta' },
-      ', and start my MS in Business Analytics and Project Management at ',
+      'My interests span AI, digital transformation, fintech, and governance, particularly how evidence-based decision-making strengthens institutions and public services. This fall I begin my MS in Business Analytics and Project Management at ',
       { label: 'UConn', href: 'https://www.business.uconn.edu/' },
-      ' this fall.',
+      '. Always happy to connect with people building technology that creates meaningful impact.',
     ],
   ],
 }
@@ -281,7 +275,7 @@ export const caseStudy = {
   category: 'Process Automation',
   year: '2024',
   title: 'Live-Issue Management Pipeline',
-  intro: 'Designed and automated an end-to-end triage pipeline across Jira and GitHub, routing ownership and status without manual chasing.',
+  intro: 'An end-to-end triage pipeline: clients raise an issue through a form, the Jira ticket opens itself, ownership routes to a developer, and resolution emails the client back.',
   /** "What I did" — three beats, in order. */
   steps: ['Mapped the workflow', 'Aligned teams & ownership', 'Automated the handoffs'],
   /** `dir` draws an up or down arrow next to the number. */
@@ -289,12 +283,26 @@ export const caseStudy = {
     { value: '30%', dir: 'down', label: 'less operational workload' },
     { value: '50%', dir: 'up', label: 'faster client response' },
   ],
-  /** The pipeline itself, drawn as a flow. Order matters. */
-  stages: ['New issue', 'Triage', 'Assign', 'In progress', 'Resolved', 'Closed'],
+  /**
+   * The pipeline itself, drawn as a flow. Order matters.
+   *
+   * `icon` is a key, not a component, so this file stays free of React
+   * imports — PipelineFlow maps it, the same way the journey timeline
+   * maps its `kind`. `by` marks who moves the work: the automated steps
+   * are the ones that used to be manual, which is where the 30% went.
+   */
+  stages: [
+    { label: 'Client submits form', icon: 'form', by: 'Client' },
+    { label: 'Logged to Sheets', icon: 'sheet', by: 'Automated' },
+    { label: 'Jira ticket created', icon: 'ticket', by: 'Automated' },
+    { label: 'Team lead assigns', icon: 'assign', by: 'Team lead' },
+    { label: 'Developer resolves', icon: 'dev', by: 'Developer' },
+    { label: 'Client emailed', icon: 'mail', by: 'Automated' },
+  ],
   blocks: [
     ['Business problem', 'Live issues arrived across scattered channels with no consistent triage path, so engineers absorbed coordination work and clients waited on status updates.'],
     ['My role', 'Owned the end-to-end redesign — mapping the existing flow, defining ownership rules, and building the automation across Jira and GitHub.'],
-    ['Process', 'Audited the live-issue lifecycle, designed routing and escalation rules, then automated status transitions and notifications to remove manual handoffs.'],
+    ['Process', 'Gave clients a single intake form that lands in Sheets and opens a Jira ticket automatically. From there the team lead assigns a developer, status transitions follow the work, and resolution triggers an email back to the client — no manual handoffs.'],
     ['Outcome', 'Operational workload down 30%, client response times 50% faster, and a documented pipeline the team could run without me.'],
   ],
   metrics: [

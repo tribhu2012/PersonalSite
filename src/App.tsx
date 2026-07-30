@@ -264,7 +264,7 @@ function App() {
             <div className="text-center">
               <Highlighted>{about.heading}</Highlighted>
             </div>
-            <Prose className="mx-auto mt-10">
+            <Prose className="mx-auto mt-10 text-justify hyphens-auto">
               {about.body.map((paragraph, i) => (
                 <p key={i}>
                   {paragraph.map((chunk, j) =>
@@ -369,65 +369,79 @@ function App() {
           {/* minmax(0,1fr) is load-bearing: without it the auto row grows to
               fit the tallest column, the fixed height stops clamping, and the
               right-hand list never scrolls. */}
-          <div className="mt-8 grid gap-5 lg:h-[520px] lg:grid-cols-[1.5fr_1fr] lg:grid-rows-[minmax(0,1fr)]">
+          {/* Height tracks the featured card's tallest column — the pipeline.
+              Too short and Card's overflow-hidden clips the tech badges. */}
+          <div className="mt-8 grid gap-5 lg:h-[600px] lg:grid-cols-[1.5fr_1fr] lg:grid-rows-[minmax(0,1fr)]">
             <Reveal className="lg:h-full">
               <Card interactive={false} className="flex h-full flex-col overflow-hidden p-6">
+                {/* Nothing previously told you this card was the featured one —
+                    the eyebrow was in the data but never rendered. */}
                 <div className="flex items-center justify-between gap-3">
-                  <Badge>{caseStudy.category}</Badge>
+                  <span className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-dot">
+                    {caseStudy.eyebrow}
+                    <span className="mx-1.5 text-slate-300">/</span>
+                    <span className="text-slate-500">{caseStudy.category}</span>
+                  </span>
                   <span className="text-[13px] font-semibold text-slate-500">{caseStudy.year}</span>
                 </div>
 
-                <div className="mt-4 grid flex-1 gap-6 lg:grid-cols-[1.05fr_0.95fr]">
-                  <div className="flex flex-col">
-                    <h3 className="text-xl font-extrabold tracking-tight text-black">{caseStudy.title}</h3>
-                    <p className="mt-2 text-[13px] leading-[1.55] text-slate-600">{caseStudy.intro}</p>
+                <h3 className="mt-2 text-2xl font-extrabold leading-tight tracking-tight text-black">
+                  {caseStudy.title}
+                </h3>
+                <p className="mt-2 text-[13px] leading-[1.6] text-slate-600">{caseStudy.intro}</p>
 
-                    <p className="mt-4 inline-block self-start text-[13px] font-extrabold text-black">
+                {/* Two tracks: what I did, and how the pipeline runs. The flow
+                    now shows at every width — it used to be lg-only, which hid
+                    the substance of the case study on phones. */}
+                <div className="mt-5 grid flex-1 gap-x-8 gap-y-5 sm:grid-cols-2">
+                  <div className="flex flex-col">
+                    <p className="inline-block self-start text-[13px] font-extrabold text-black">
                       <span className="swipe">What I did</span>
                     </p>
-                    <ol className="mt-2.5 space-y-1.5">
+                    <ol className="mt-3 space-y-2">
                       {caseStudy.steps.map((step, i) => (
                         <li key={step} className="flex items-center gap-2.5 text-[13px] leading-5 text-slate-600">
-                          <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-navy text-[10px] font-bold text-white">
+                          <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-slate-300 text-[10px] font-bold text-navy">
                             {i + 1}
                           </span>
                           {step}
                         </li>
                       ))}
                     </ol>
-
-                    <div className="mt-4 border-t border-dashed border-slate-300 pt-3.5">
-                      <p className="inline-block text-[13px] font-extrabold text-black">
-                        <span className="swipe">Impact</span>
-                      </p>
-                      <div className="mt-3 flex flex-wrap gap-x-6 gap-y-3">
-                        {caseStudy.impact.map((metric) => (
-                          <div key={metric.label} className="flex items-center gap-2.5">
-                            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-mint/40 text-[14px] font-extrabold text-navy">
-                              {metric.value}
-                            </span>
-                            <span className="flex items-center gap-1 text-[12px] leading-4 text-slate-600">
-                              {metric.dir === 'down' ? (
-                                <ArrowDown size={13} className="shrink-0 text-dot" />
-                              ) : (
-                                <ArrowUp size={13} className="shrink-0 text-dot" />
-                              )}
-                              <span className="max-w-[7.5rem]">{metric.label}</span>
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
                   </div>
 
-                  {/* The pipeline, drawn as a flow. */}
-                  <div className="hidden items-center lg:flex">
-                    <PipelineFlow stages={caseStudy.stages} />
+                  <div className="flex flex-col">
+                    <p className="inline-block self-start text-[13px] font-extrabold text-black">
+                      <span className="swipe">How it runs</span>
+                    </p>
+                    <div className="mt-3.5">
+                      <PipelineFlow stages={caseStudy.stages} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Impact is the payoff, so it gets the full width and the
+                    biggest type on the card rather than a cramped column. */}
+                <div className="mt-5 border-t border-dashed border-slate-300 pt-4">
+                  <div className="grid gap-2.5 sm:grid-cols-2">
+                    {caseStudy.impact.map((metric) => (
+                      <div key={metric.label} className="flex items-baseline gap-2.5 rounded-2xl bg-band px-4 py-3">
+                        <span className="text-2xl font-extrabold leading-none tracking-tight text-navy">
+                          {metric.value}
+                        </span>
+                        {metric.dir === 'down' ? (
+                          <ArrowDown size={15} className="shrink-0 self-center text-dot" />
+                        ) : (
+                          <ArrowUp size={15} className="shrink-0 self-center text-dot" />
+                        )}
+                        <span className="text-[12px] font-semibold leading-4 text-slate-600">{metric.label}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
                 {featuredProject && (
-                  <div className="mt-auto flex flex-wrap gap-1.5 border-t border-slate-100 pt-4">
+                  <div className="mt-4 flex flex-wrap gap-1.5 border-t border-slate-100 pt-4">
                     {featuredProject.technologies.map((tech) => <Badge key={tech}>{tech}</Badge>)}
                   </div>
                 )}

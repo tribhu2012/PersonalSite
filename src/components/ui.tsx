@@ -1,6 +1,7 @@
 import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from 'react'
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
+import { ClipboardList, Code2, Mail, MailCheck, Table2, TicketCheck, UserCheck, Zap } from 'lucide-react'
 
 type ButtonProps = {
   children: ReactNode
@@ -265,43 +266,64 @@ export function PinnedCard({ title, items }: { title: string; items: string[] })
   )
 }
 
+export type PipelineStage = { label: string; icon: string; by: string }
+
 /**
- * Pipeline stages drawn as a boustrophedon flow: two per row, alternating
- * direction, with a drop between rows on whichever side the row ended.
- * Takes any even-ish number of stages; a trailing odd one sits alone.
+ * Icon key → mark. Keys live in portfolioData so that file needs no React
+ * import, matching how the journey timeline maps its `kind`.
  */
-export function PipelineFlow({ stages }: { stages: string[] }) {
-  const rows: string[][] = []
-  for (let i = 0; i < stages.length; i += 2) rows.push(stages.slice(i, i + 2))
+const STAGE_ICONS: Record<string, typeof Mail> = {
+  form: ClipboardList,
+  sheet: Table2,
+  ticket: TicketCheck,
+  assign: UserCheck,
+  dev: Code2,
+  mail: MailCheck,
+}
 
-  const box = 'rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-center text-[11px] font-semibold leading-tight text-navy shadow-sm'
-
+/**
+ * Pipeline stages drawn as a vertical rail of icon tiles. Vertical because
+ * it reads at any width and takes any number of stages; icon-led because a
+ * column of numbered text is a checklist, not a flow.
+ *
+ * Automated steps carry the teal accent — they're the handoffs that used to
+ * be manual, so the colour is doing the case study's argument. The closing
+ * client-facing step gets the mint fill the site uses to mark a payoff.
+ */
+export function PipelineFlow({ stages }: { stages: PipelineStage[] }) {
   return (
-    <div className="w-full">
-      {rows.map((row, r) => {
-        // Rows run left-to-right, then right-to-left, so the flow snakes.
-        const rightward = r % 2 === 0
-        const dropOnRight = rightward
+    <ol className="relative w-full">
+      {/* Spine is inset by the tile's half-height so it never pokes out past
+          the first and last tiles. */}
+      <span aria-hidden className="absolute bottom-5 left-[17px] top-5 w-[2px] rounded bg-slate-200" />
+
+      {stages.map((stage, i) => {
+        const Icon = STAGE_ICONS[stage.icon] ?? Zap
+        const last = i === stages.length - 1
+        const auto = stage.by === 'Automated'
+
+        // Opaque tiles, so the spine only shows in the gaps between them.
+        const tile = last
+          ? 'bg-mint text-navy'
+          : auto
+            ? 'bg-dot/12 text-dot ring-1 ring-dot/25'
+            : 'bg-band text-navy ring-1 ring-slate-200'
 
         return (
-          <div key={row.join('-')}>
-            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1.5">
-              <div className={box}>{rightward ? row[0] : row[1] ?? ''}</div>
-              <span className="text-[13px] text-slate-400">{rightward ? '→' : '←'}</span>
-              <div className={row[1] ? box : ''}>{rightward ? row[1] ?? '' : row[0]}</div>
-            </div>
-
-            {r < rows.length - 1 && (
-              <div className="grid grid-cols-[1fr_auto_1fr] py-1">
-                <span className={`text-center text-[13px] text-slate-400 ${dropOnRight ? 'invisible' : ''}`}>↓</span>
-                <span />
-                <span className={`text-center text-[13px] text-slate-400 ${dropOnRight ? '' : 'invisible'}`}>↓</span>
-              </div>
-            )}
-          </div>
+          <li key={stage.label} className={`relative flex items-center gap-3 ${i > 0 ? 'mt-2' : ''}`}>
+            <span className={`flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-xl ${tile}`}>
+              <Icon size={16} strokeWidth={2.4} />
+            </span>
+            <span className="min-w-0">
+              <span className="block truncate text-[12.5px] font-bold leading-4 text-navy">{stage.label}</span>
+              <span className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">
+                {stage.by}
+              </span>
+            </span>
+          </li>
         )
       })}
-    </div>
+    </ol>
   )
 }
 
