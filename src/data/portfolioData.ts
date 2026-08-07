@@ -1,7 +1,8 @@
 /**
  * ─────────────────────────────────────────────────────────────
  *  ALL SITE CONTENT LIVES HERE. Edit this file only.
- *  Sourced from TribhuwanCV.pdf and the UConn admission letter.
+ *  Sourced from TribhuwanCV.pdf.
+ *  [UConn content is commented out for now — search "UConn" to restore.]
  * ─────────────────────────────────────────────────────────────
  */
 import blogPosts from './blogPosts.json'
@@ -9,8 +10,9 @@ import blogPosts from './blogPosts.json'
 export const profile = {
   name: 'Tribhuwan Bhatta',
   role: 'Engineer | Project Manager',
-  location: 'Kathmandu, Nepal · Relocating to Hartford, CT',
-  availability: 'Incoming MS student at UConn',
+  // location: 'Hartford, CT, USA',
+  location: 'Kathmandu, Nepal',
+  // availability: 'Incoming MS student at UConn',
   email: 'tribhuwanbhatt7@gmail.com',
   phone: '+977-9869068078',
   linkedin: 'https://www.linkedin.com/in/tribbhatt/',
@@ -29,7 +31,7 @@ export const navigation = [
   { label: 'Career', href: '#experience' },
   { label: 'My Work', href: '#projects' },
   { label: 'Writing', href: '#writing' },
-  { label: 'What I Do', href: '#skills' },
+  { label: 'Skills', href: '#skills' },
   { label: 'Credentials', href: '#credentials' },
   { label: 'Contact', href: '#contact' },
 ]
@@ -43,7 +45,7 @@ export const navGroups = {
   ],
   right: [
     { label: 'Writing', href: '#writing' },
-    { label: 'What I Do', href: '#skills' },
+    { label: 'Skills', href: '#skills' },
     { label: 'Contact', href: '#contact' },
   ],
 }
@@ -56,7 +58,7 @@ export const navGroups = {
 export const hero = {
   /** Two big lines, each closed with an accent dot. */
   headline: ['Hey', "I'm Tribhuwan"],
-  subtitle: ['Engineer & Project Manager', 'Incoming MS student at UConn'],
+  subtitle: ['Engineer & Project Manager' /*, 'Incoming MS student at UConn' */],
   image: '/hero.png',
   imageAlt: 'Illustration of Tribhuwan working at his laptop.',
   /**
@@ -77,7 +79,10 @@ export const hero = {
  * is written into the first paragraph instead — the tiles are gone, the
  * fact isn't.
  */
-export const about = {
+/** A paragraph is a list of these: plain text, or a chunk that renders as a link. */
+type ProseChunk = string | { label: string; href: string }
+
+export const about: { heading: string; body: ProseChunk[][] } = {
   heading: 'About',
   /* Kept to three paragraphs so the section still fits one screen. */
   body: [
@@ -88,9 +93,9 @@ export const about = {
       "I'm passionate about improving how organisations operate: automating workflows across Jira and GitHub, establishing a Project Management Office from the ground up, mentoring early-career professionals. The through-line is building systems that are scalable, efficient, and driven by data.",
     ],
     [
-      'My interests span AI, digital transformation, fintech, and governance, particularly how evidence-based decision-making strengthens institutions and public services. This fall I begin my MS in Business Analytics and Project Management at ',
-      { label: 'UConn', href: 'https://www.business.uconn.edu/' },
-      '. Always happy to connect with people building technology that creates meaningful impact.',
+      /* UConn sentence removed for now — original:
+         '... public services. This fall I begin my MS in Business Analytics and Project Management at UConn. Always happy ...' */
+      'My interests span AI, digital transformation, fintech, and governance, particularly how evidence-based decision-making strengthens institutions and public services. Always happy to connect with people building technology that creates meaningful impact.',
     ],
   ],
 }
@@ -124,13 +129,16 @@ export const journey = [
     note: '',
     kind: 'study',
   },
-  { period: '2023 — 2024', title: 'R&D Intern', place: 'NSDevil, South Korea', kind: 'work' },
-  { period: 'June 2024 — July 2026', title: 'Associate Project Manager', place: 'CityTech Group, Kathmandu', kind: 'work' },
-  { period: '2024 — 2026', title: 'Faculty Member', place: 'SAIM College, Kathmandu', kind: 'work' },
-  { period: '2025', title: 'Faculty Member', place: 'Malpi International College, Kathmandu', kind: 'work' },
-  /* [TODO] Placeholder date — replace with the real term. */
-  { period: '2025 — 2026', title: 'Product Lead, Nagarik Chautari', place: 'Office of the Prime Minister, Govt. of Nepal', kind: 'work' },
-  { period: 'Fall 2026', title: 'MS Business Analytics & Project Management', place: 'University of Connecticut, Hartford', kind: 'study' },
+  /* Months abbreviated throughout: the road label is w-48 and the period
+     renders uppercase with letter-spacing, so "September 2025" spelled out
+     wraps onto a second line and pushes the title off its marker. */
+  { period: 'Jul 2023 — Apr 2024', title: 'R&D Intern', place: 'NSDevil, South Korea', kind: 'work' },
+  { period: 'Jun 2024 — Jul 2026', title: 'Associate Project Manager', place: 'CityTech Group, Kathmandu', kind: 'work' },
+  { period: 'Oct 2024 — Aug 2026', title: 'Faculty Member', place: 'SAIM College, Kathmandu', kind: 'work' },
+  { period: 'Sep 2025 — Mar 2026', title: 'Faculty Member', place: 'Malpi International College, Kathmandu', kind: 'work' },
+  { period: 'Apr 2026 — Aug 2026', title: 'Product Lead, Nagarik Chautari', place: 'Office of the Prime Minister, Govt. of Nepal', kind: 'work' },
+  // { period: 'Fall 2026', title: 'MS Business Analytics & Project Management', place: 'University of Connecticut, Hartford', kind: 'study' },
+  // { period: 'Fall 2026', title: 'Graduate Research Assistant', place: 'Connecticut Transportation Institute, Storrs, CT', kind: 'work' },
 ]
 
 /**
@@ -240,6 +248,20 @@ export const projects = [
     technologies: ['Power BI', 'Looker Studio', 'Google Sheets'],
   },
   {
+    title: 'Unified Testing Module',
+    /* Built in Apps Script, so it sits under Development. Flip `track` to
+       'pm' if you'd rather lead with the QA-governance side of it. */
+    track: 'dev',
+    category: 'QA Tooling',
+    role: 'Associate Project Manager',
+    /* [TODO] Placeholder year — replace with the real one. */
+    timeline: '2025',
+    status: 'Live',
+    description: 'A UI-based testing platform anyone can pick up unsupported: testers walk the whole product, add test cases as they go, and raise a bug ticket straight from a failed step. Leads assign modules to testers, watch progress live, and generate reports from the same place.',
+    outcome: 'Product-wide testing with no QA hand-holding',
+    technologies: ['Apps Script', 'Google Sheets', 'Jira', 'HTML Service'],
+  },
+  {
     title: 'Autonomous Mobile Robot Navigation',
     track: 'dev',
     category: 'Research',
@@ -250,6 +272,32 @@ export const projects = [
     outcome: 'Validated navigation and perception improvements',
     technologies: ['ROS2', 'VSLAM', 'MPC', 'Python'],
   },
+]
+
+/**
+ * Products I've worked on — logo and name only, each tile linking out.
+ *
+ * `logo` is a path under public/, so dropping getpay.png into that folder
+ * is all the paths below need. Until a file exists the tile shows the
+ * product's initials instead — a blank `logo` *and* a 404 both fall back,
+ * so logos can be added one at a time without a broken image on the page.
+ *
+ * `url` is blank on every entry: a link that 404s reads worse than no link
+ * at all, and an entry without one renders as an unlinked tile. Fill them
+ * in as you have them.
+ *
+ * The whole strip is hidden while this array is empty.
+ */
+export const products: { name: string; logo?: string; url?: string }[] = [
+  { name: 'GetPay', logo: '/getpay.webp', url: 'https://getpay.global' },
+  { name: 'FinPOS', logo: '/finpos.svg', url: 'https://finpos.global' },
+  /* [CHECK] The product is listed as FinPulse but the page is /finpro/ — if the
+     product is actually called FinPro, rename it here and in the logo file. */
+  { name: 'FinPulse', logo: '/finpulse.webp', url: 'https://citytech.global/finpro/' },
+  { name: 'BLB', logo: '/blb.webp', url: 'https://citytech.global/finpro/#branchless-banking' },
+  /* [CHECK] Government site is http-only; browsers may flag it as not secure. */
+  { name: 'Nagarik Chautari', logo: '/nagarik-chautari.svg', url: 'http://nagarikchautari.opmcm.gov.np' },
+  { name: 'Autonomous Robot', logo: '/robo.avif', url: 'https://www.nsdevil.com/nsd-robo?lang=en' },
 ]
 
 /**
@@ -367,7 +415,8 @@ export const skills = [
   },
   {
     title: 'Technical',
-    items: ['Python · MySQL', 'Apps Script · Git', 'ROS2 · VSLAM', 'Power BI · Tableau', 'Looker Studio', 'Workflow automation'],
+    /* One skill per line — the "Python · MySQL" pairings are gone. */
+    items: ['Python', 'MySQL', 'Apps Script', 'Git', 'Workflow automation'],
   },
 ]
 
@@ -393,14 +442,33 @@ export const achievements = [
 
 export const tools = ['Jira', 'GitHub', 'Confluence', 'Notion', 'Power BI', 'Tableau', 'MS Project', 'Google Workspace']
 
+/**
+ * Everything past `accent` is optional and the card only renders what's
+ * there — so a certification can gain a logo, a status or a credential link
+ * later without touching App.tsx.
+ */
+type Certification = {
+  name: string
+  issuer: string
+  category: string
+  accent: string
+  featured?: boolean
+  logo?: string
+  blurb?: string
+  tags?: string[]
+  status?: string
+  year?: string
+  url?: string
+}
+
 export const credentials = {
   education: [
-    {
-      degree: 'MS, Business Analytics and Project Management',
-      school: 'University of Connecticut, Hartford',
-      period: 'Fall 2026 — Incoming',
-      note: 'School of Business',
-    },
+    // {
+    //   degree: 'MS, Business Analytics and Project Management',
+    //   school: 'University of Connecticut, Hartford',
+    //   period: 'Fall 2026 — Incoming',
+    //   note: 'School of Business',
+    // },
     {
       degree: 'BE, Electronics, Communication and Information Engineering',
       school: 'IOE, Pulchowk Campus',
@@ -431,15 +499,33 @@ export const credentials = {
       category: 'Featured credential',
       featured: true,
       accent: '#2f6b4f',
+      /**
+       * The official badge is a Scrum Inc. trademark, so it isn't bundled
+       * here. Save your copy to public/rsm-badge.png — the card swaps it in.
+       * If the file is missing the card falls back to the drawn RsmBadge
+       * mark, so this path is safe to set before the upload lands. Change
+       * the extension here if you save it as .webp/.svg instead.
+       */
+      logo: '/rsm-badge.png',
       /* Your words are better than mine here — edit freely. */
       blurb: 'Sharpened how I deliver value iteratively, keep cross-functional teams aligned, and improve the process every sprint.',
-      tags: ['Agile & Delivery', 'Team Leadership'],
+      tags: ['Agile & Delivery', 'Team Leadership', 'Scrum', 'Project Management'],
       year: '',
       url: '',
     },
     {
       name: 'Google Project Management',
       issuer: 'Google · Professional Certificate',
+      category: 'Project management',
+      accent: '#3b82f6',
+      year: '',
+      url: '',
+    },
+    {
+      name: 'Software Processes and Agile Practices',
+      issuer: 'University of Alberta',
+      /* Same category and accent as the Google certificate, so the two
+         project-management cards read as a pair. */
       category: 'Project management',
       accent: '#3b82f6',
       year: '',
@@ -456,7 +542,25 @@ export const credentials = {
     {
       name: 'Product Foundations',
       issuer: 'Product Vidhyalaya',
-      category: 'Foundations',
+      /* Grouped with Software Product Management — same category label and
+         accent, so the two read as one pair on the grid. */
+      category: 'Product management',
+      accent: '#f97316',
+      year: '',
+      url: '',
+    },
+    {
+      name: 'Python Data Structure',
+      issuer: 'University of Michigan',
+      category: 'Programming',
+      accent: '#8b5cf6',
+      year: '',
+      url: '',
+    },
+    {
+      name: 'Programming For Everybody',
+      issuer: 'University of Michigan',
+      category: 'Programming',
       accent: '#8b5cf6',
       year: '',
       url: '',
@@ -466,11 +570,10 @@ export const credentials = {
       issuer: 'Nepal Engineering Council',
       category: 'Professional licence',
       accent: '#1e3a8a',
-      status: 'Active',
       year: '',
       url: '',
     },
-  ],
+  ] as Certification[],
   publications: [
     {
       citation: 'Bhatt N, Bhatt B, Neupane B, Karki A, Bhatta T, Thapa J, et al. (2021). Perceptions of family planning services and its key barriers among adolescents and young people in Eastern Nepal: A qualitative study.',

@@ -27,6 +27,7 @@ import {
   linkedinPosts,
   navGroups,
   navigation,
+  products,
   profile,
   projects,
   skills,
@@ -40,11 +41,12 @@ import {
   LinkedinIcon,
   Loader,
   PinnedCard,
+  ProductLogo,
   PipelineFlow,
   Prose,
   ProseLink,
   Reveal,
-  RsmBadge,
+  CertBadge,
   Screen,
   SectionHeading,
   StickerButton,
@@ -134,6 +136,17 @@ function App() {
 
   const featuredCert = credentials.certifications.find((cert) => cert.featured)
   const otherCerts = credentials.certifications.filter((cert) => !cert.featured)
+
+  /* One card per category, not per credential — two certificates in the same
+     discipline belong in the same box. Built by walking the list in order so
+     the categories keep the order they're written in portfolioData, and the
+     first entry of each group sets the card's accent. */
+  const certGroups = otherCerts.reduce<{ category: string; accent: string; items: typeof otherCerts }[]>((groups, cert) => {
+    const group = groups.find((g) => g.category === cert.category)
+    if (group) group.items.push(cert)
+    else groups.push({ category: cert.category, accent: cert.accent, items: [cert] })
+    return groups
+  }, [])
 
   // Derived, not an effect: a hidden bar must not leave a menu on screen.
   const showMenu = menuOpen && !hidden
@@ -294,9 +307,52 @@ function App() {
                 className="absolute left-0 w-full"
                 style={{ top: ROAD_TOP, height: ROAD_H }}
               >
+                <defs>
+                  {/* Hand-drawn wobble. Turbulence pushes every edge off true
+                      by a few units, so the asphalt reads as inked by hand
+                      rather than stroked by a machine. Each layer takes a
+                      different seed — sharing one would displace them
+                      identically and the wobble would cancel out.
+
+                      Low baseFrequency on purpose: the viewBox is squashed
+                      horizontally (preserveAspectRatio="none"), which raises
+                      the effective frequency, and anything much above ~0.01
+                      turns the edge from a meander into fuzz. */}
+                  <filter id="road-ink" x="-6%" y="-40%" width="112%" height="180%">
+                    <feTurbulence type="fractalNoise" baseFrequency="0.008" numOctaves="2" seed="4" result="noise" />
+                    <feDisplacementMap in="SourceGraphic" in2="noise" scale="6" xChannelSelector="R" yChannelSelector="G" />
+                  </filter>
+                  <filter id="road-ink-2" x="-6%" y="-40%" width="112%" height="180%">
+                    <feTurbulence type="fractalNoise" baseFrequency="0.011" numOctaves="2" seed="11" result="noise" />
+                    <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" xChannelSelector="R" yChannelSelector="G" />
+                  </filter>
+                </defs>
+
+                {/* Sketched underdraw: a fainter, wider pass offset a touch,
+                    the way a pencil line gets gone over twice. */}
+                <path
+                  d={ROAD_PATH}
+                  fill="none"
+                  stroke="#1b2a47"
+                  strokeWidth="26"
+                  strokeLinecap="round"
+                  opacity="0.28"
+                  filter="url(#road-ink-2)"
+                  transform="translate(1.5 2)"
+                />
+
                 {/* Asphalt, then the dashed centre line on top. */}
-                <path d={ROAD_PATH} fill="none" stroke="#1b2a47" strokeWidth="24" strokeLinecap="round" />
-                <path d={ROAD_PATH} fill="none" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="16 14" opacity="0.8" />
+                <path d={ROAD_PATH} fill="none" stroke="#1b2a47" strokeWidth="24" strokeLinecap="round" filter="url(#road-ink)" />
+                <path
+                  d={ROAD_PATH}
+                  fill="none"
+                  stroke="#ffffff"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeDasharray="16 14"
+                  opacity="0.8"
+                  filter="url(#road-ink-2)"
+                />
               </svg>
 
               {journey.map((stop, i) => {
@@ -390,10 +446,9 @@ function App() {
                 </h3>
                 <p className="mt-2 text-[13px] leading-[1.6] text-slate-600">{caseStudy.intro}</p>
 
-                {/* Two tracks: what I did, and how the pipeline runs. The flow
-                    now shows at every width — it used to be lg-only, which hid
-                    the substance of the case study on phones. */}
-                <div className="mt-5 grid flex-1 gap-x-8 gap-y-5 sm:grid-cols-2">
+                {/* What I did and what it bought, side by side — both are short
+                    lists, so they pair without either feeling cramped. */}
+                <div className="mt-5 grid gap-x-8 gap-y-5 sm:grid-cols-2">
                   <div className="flex flex-col">
                     <p className="inline-block self-start text-[13px] font-extrabold text-black">
                       <span className="swipe">What I did</span>
@@ -412,31 +467,34 @@ function App() {
 
                   <div className="flex flex-col">
                     <p className="inline-block self-start text-[13px] font-extrabold text-black">
-                      <span className="swipe">How it runs</span>
+                      <span className="swipe">Impact</span>
                     </p>
-                    <div className="mt-3.5">
-                      <PipelineFlow stages={caseStudy.stages} />
+                    <div className="mt-3 space-y-2.5">
+                      {caseStudy.impact.map((metric) => (
+                        <div key={metric.label} className="flex items-baseline gap-2.5 rounded-2xl bg-band px-4 py-3">
+                          <span className="text-2xl font-extrabold leading-none tracking-tight text-navy">
+                            {metric.value}
+                          </span>
+                          {metric.dir === 'down' ? (
+                            <ArrowDown size={15} className="shrink-0 self-center text-dot" />
+                          ) : (
+                            <ArrowUp size={15} className="shrink-0 self-center text-dot" />
+                          )}
+                          <span className="text-[12px] font-semibold leading-4 text-slate-600">{metric.label}</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
 
-                {/* Impact is the payoff, so it gets the full width and the
-                    biggest type on the card rather than a cramped column. */}
-                <div className="mt-5 border-t border-dashed border-slate-300 pt-4">
-                  <div className="grid gap-2.5 sm:grid-cols-2">
-                    {caseStudy.impact.map((metric) => (
-                      <div key={metric.label} className="flex items-baseline gap-2.5 rounded-2xl bg-band px-4 py-3">
-                        <span className="text-2xl font-extrabold leading-none tracking-tight text-navy">
-                          {metric.value}
-                        </span>
-                        {metric.dir === 'down' ? (
-                          <ArrowDown size={15} className="shrink-0 self-center text-dot" />
-                        ) : (
-                          <ArrowUp size={15} className="shrink-0 self-center text-dot" />
-                        )}
-                        <span className="text-[12px] font-semibold leading-4 text-slate-600">{metric.label}</span>
-                      </div>
-                    ))}
+                {/* The pipeline gets the full card width so it can run across
+                    columns rather than down a single narrow rail. */}
+                <div className="mt-5 flex-1 border-t border-dashed border-slate-300 pt-4">
+                  <p className="inline-block text-[13px] font-extrabold text-black">
+                    <span className="swipe">How it runs</span>
+                  </p>
+                  <div className="mt-3">
+                    <PipelineFlow stages={caseStudy.stages} />
                   </div>
                 </div>
 
@@ -474,6 +532,58 @@ function App() {
               />
             </div>
           </div>
+
+          {/* Products I've worked on — a logo wall, deliberately just marks
+              and names. Hidden entirely until `products` has entries. */}
+          {products.length > 0 && (
+            <div className="mt-10 border-t border-dashed border-slate-300 pt-7">
+              <Reveal>
+                <p className="text-center text-base font-extrabold text-black sm:text-lg">
+                  <span className="swipe">Products I&rsquo;ve worked on</span>
+                </p>
+              </Reveal>
+
+              <Reveal>
+                {/* Marks only, sitting straight on the background — no tile.
+                    Deliberately NOT an equal-width grid: these logos run from
+                    5:1 wordmarks to 1:1 square marks, so equal cells left the
+                    square ones swimming in space. Each mark instead shrink-
+                    wraps inside a max-height/max-width box and flex spreads
+                    them, so the spacing is even between the marks themselves.
+                    The width cap is what keeps a 5:1 wordmark from dwarfing
+                    the rest. */}
+                <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-10 gap-y-8 sm:justify-between">
+                  {products.map((product) => {
+                    const shell =
+                      'flex h-12 max-w-[130px] items-center justify-center sm:h-14 sm:max-w-[150px]'
+                    const inner = <ProductLogo src={product.logo} name={product.name} />
+
+                    return (
+                      <li key={product.name}>
+                        {product.url ? (
+                          <a
+                            href={product.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            /* title gives the name back on hover, aria-label to screen readers. */
+                            title={product.name}
+                            aria-label={product.name}
+                            className={`${shell} transition duration-300 hover:-translate-y-0.5 hover:scale-105`}
+                          >
+                            {inner}
+                          </a>
+                        ) : (
+                          <span className={shell} title={product.name}>
+                            {inner}
+                          </span>
+                        )}
+                      </li>
+                    )
+                  })}
+                </ul>
+              </Reveal>
+            </div>
+          )}
         </Screen>
 
         {/* ── Writing ───────────────────────────────────────── */}
@@ -590,7 +700,8 @@ function App() {
           </Reveal>
 
           {/* Featured credential on the left with the Scrum Inc. badge, the
-              rest in a 2x2 grid. Coloured spine per card. */}
+              rest grouped by category on the right — one card per discipline,
+              however many certificates sit inside it. Coloured spine per card. */}
           <div className="mt-8 grid gap-5 lg:grid-cols-[0.85fr_1.15fr]">
             {featuredCert && (
               <Reveal>
@@ -605,7 +716,9 @@ function App() {
                   </div>
 
                   <div className="mt-5 flex items-start gap-5 pl-1.5">
-                    <RsmBadge size={86} className="shrink-0" />
+                    {/* Official badge if one has been dropped into public/, the
+                        drawn mark otherwise. See `logo` in portfolioData. */}
+                    <CertBadge src={featuredCert.logo} alt={`${featuredCert.name} badge`} size={86} />
                     <div className="min-w-0">
                       <h3 className="text-xl font-extrabold leading-tight tracking-tight text-black">{featuredCert.name}</h3>
                       <p className="mt-1.5 text-[14px] text-slate-600">{featuredCert.issuer}</p>
@@ -614,7 +727,12 @@ function App() {
 
                   <p className="mt-5 border-t border-slate-100 pt-4 pl-1.5 text-[14px] leading-6 text-slate-600">{featuredCert.blurb}</p>
 
-                  <div className="mt-4 flex flex-wrap gap-2 pl-1.5">
+                  {/* mt-auto, not mt-4: the card stretches to the height of the
+                      grouped cards beside it, and with no year/url to render
+                      the slack would otherwise pool as dead space below the
+                      tags. Pinning them to the bottom turns it into a footer.
+                      Below lg the card is content-height, so this is a no-op. */}
+                  <div className="mt-auto flex flex-wrap gap-2 pl-1.5 pt-4">
                     {featuredCert.tags?.map((tag) => <Badge key={tag}>{tag}</Badge>)}
                   </div>
 
@@ -634,44 +752,52 @@ function App() {
             )}
 
             <div className="grid gap-5 sm:grid-cols-2">
-              {otherCerts.map((cert) => (
-                <Reveal key={cert.name}>
+              {certGroups.map((group) => (
+                <Reveal key={group.category}>
                   <Card className="relative flex h-full flex-col overflow-hidden p-5">
-                    <span aria-hidden="true" className="absolute inset-y-0 left-0 w-[5px]" style={{ background: cert.accent }} />
+                    <span aria-hidden="true" className="absolute inset-y-0 left-0 w-[5px]" style={{ background: group.accent }} />
 
-                    <p className="pl-1 text-[11px] font-bold uppercase tracking-[0.12em]" style={{ color: cert.accent }}>
-                      {cert.category}
+                    <p className="pl-1 text-[11px] font-bold uppercase tracking-[0.12em]" style={{ color: group.accent }}>
+                      {group.category}
                     </p>
-                    <h3 className="mt-1.5 pl-1 text-[17px] font-extrabold leading-tight tracking-tight text-black">{cert.name}</h3>
-                    <p className="mt-1.5 pl-1 text-[13px] leading-snug text-slate-500">{cert.issuer}</p>
 
-                    {(cert.year || cert.status || cert.url) && (
-                      <div className="mt-auto pl-1 pt-4">
-                        <div className="flex items-center gap-3 border-t border-dashed border-slate-200 pt-3 text-[13px] text-slate-600">
-                          {cert.year && (
-                            <span className="inline-flex items-center gap-1.5">
-                              <CalendarDays size={13} className="text-slate-400" /> {cert.year}
-                            </span>
+                    {/* Credentials stack inside the one card, split by a dashed
+                        rule rather than each getting a box of its own. */}
+                    <div className="mt-1.5 divide-y divide-dashed divide-slate-200">
+                      {group.items.map((cert) => (
+                        <div key={cert.name} className="py-2.5 first:pt-0 last:pb-0">
+                          <h3 className="pl-1 text-[17px] font-extrabold leading-tight tracking-tight text-black">{cert.name}</h3>
+                          <p className="mt-1.5 pl-1 text-[13px] leading-snug text-slate-500">{cert.issuer}</p>
+
+                          {(cert.year || cert.status) && (
+                            <div className="mt-2 flex items-center gap-3 pl-1 text-[13px] text-slate-600">
+                              {cert.year && (
+                                <span className="inline-flex items-center gap-1.5">
+                                  <CalendarDays size={13} className="text-slate-400" /> {cert.year}
+                                </span>
+                              )}
+                              {cert.status && (
+                                <span className="inline-flex items-center gap-1.5">
+                                  <CircleCheck size={13} className="text-dot" /> {cert.status}
+                                </span>
+                              )}
+                            </div>
                           )}
-                          {cert.status && (
-                            <span className="inline-flex items-center gap-1.5">
-                              <CircleCheck size={13} className="text-dot" /> {cert.status}
-                            </span>
+
+                          {cert.url && (
+                            <a
+                              href={cert.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="mt-1.5 inline-flex items-center gap-1.5 pl-1 text-[13px] font-bold transition hover:gap-2.5"
+                              style={{ color: group.accent }}
+                            >
+                              View credential <ArrowUpRight size={13} />
+                            </a>
                           )}
                         </div>
-                        {cert.url && (
-                          <a
-                            href={cert.url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="mt-2 inline-flex items-center gap-1.5 text-[13px] font-bold transition hover:gap-2.5"
-                            style={{ color: cert.accent }}
-                          >
-                            View credential <ArrowUpRight size={13} />
-                          </a>
-                        )}
-                      </div>
-                    )}
+                      ))}
+                    </div>
                   </Card>
                 </Reveal>
               ))}
@@ -726,12 +852,14 @@ function App() {
           <div className="mx-auto max-w-3xl text-center">
             <Reveal>
               <h2 className="text-4xl font-extrabold leading-[1.05] tracking-tight text-black sm:text-5xl lg:text-6xl">
-                Let&rsquo;s work together
+                Let&rsquo;s stay in touch
                 <span className="text-dot">.</span>
               </h2>
+              {/* UConn line commented out for now — original opener:
+                  "I’m starting my MS in Business Analytics and Project Management at UConn in Fall 2026, and" */}
               <p className="mx-auto mt-5 max-w-xl text-lg font-bold leading-8 text-slate-800">
-                I&rsquo;m starting my MS in Business Analytics and Project Management at UConn in Fall 2026 and
-                I&rsquo;m open to PM roles and internships in the US. Email is fastest — I reply to everything.
+                I&rsquo;m always glad to talk delivery, automation, policy, governance, or whatever
+                you&rsquo;re building. Email is fastest, and I reply to everything.
               </p>
 
               <div className="mt-8 flex flex-wrap items-center justify-center gap-5">

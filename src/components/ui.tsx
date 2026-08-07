@@ -282,42 +282,47 @@ const STAGE_ICONS: Record<string, typeof Mail> = {
 }
 
 /**
- * Pipeline stages drawn as a vertical rail of icon tiles. Vertical because
- * it reads at any width and takes any number of stages; icon-led because a
- * column of numbered text is a checklist, not a flow.
+ * Pipeline stages drawn as a grid of icon tiles that reflows by width —
+ * one column on phones, two at sm, three at lg. Multi-column rather than a
+ * single rail so the flow reads across the card instead of running it long,
+ * and it takes any number of stages without the layout changing shape.
  *
- * Automated steps carry the teal accent — they're the handoffs that used to
- * be manual, so the colour is doing the case study's argument. The closing
- * client-facing step gets the mint fill the site uses to mark a payoff.
+ * Order is carried by the "Step n" meta line rather than connectors, which
+ * would have to know where each row wraps.
+ *
+ * Automated steps carry the teal accent on the icon chip — they're the
+ * handoffs that used to be manual, so the colour is doing the case study's
+ * argument. The closing client-facing step gets the mint fill the site uses
+ * to mark a payoff.
  */
 export function PipelineFlow({ stages }: { stages: PipelineStage[] }) {
   return (
-    <ol className="relative w-full">
-      {/* Spine is inset by the tile's half-height so it never pokes out past
-          the first and last tiles. */}
-      <span aria-hidden className="absolute bottom-5 left-[17px] top-5 w-[2px] rounded bg-slate-200" />
-
+    <ol className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
       {stages.map((stage, i) => {
         const Icon = STAGE_ICONS[stage.icon] ?? Zap
         const last = i === stages.length - 1
         const auto = stage.by === 'Automated'
 
-        // Opaque tiles, so the spine only shows in the gaps between them.
-        const tile = last
+        // Only the chip is coloured — tinting whole tiles would make the
+        // automated steps shout over the rest of the card.
+        const chip = last
           ? 'bg-mint text-navy'
           : auto
             ? 'bg-dot/12 text-dot ring-1 ring-dot/25'
             : 'bg-band text-navy ring-1 ring-slate-200'
 
         return (
-          <li key={stage.label} className={`relative flex items-center gap-3 ${i > 0 ? 'mt-2' : ''}`}>
-            <span className={`flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-xl ${tile}`}>
-              <Icon size={16} strokeWidth={2.4} />
+          <li
+            key={stage.label}
+            className="flex items-center gap-2.5 rounded-2xl bg-white px-3 py-2.5 ring-1 ring-slate-200"
+          >
+            <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ${chip}`}>
+              <Icon size={15} strokeWidth={2.4} />
             </span>
             <span className="min-w-0">
-              <span className="block truncate text-[12.5px] font-bold leading-4 text-navy">{stage.label}</span>
-              <span className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">
-                {stage.by}
+              <span className="block truncate text-[12px] font-bold leading-4 text-navy">{stage.label}</span>
+              <span className="block text-[9.5px] font-semibold uppercase tracking-[0.08em] text-slate-400">
+                Step {i + 1} · {stage.by}
               </span>
             </span>
           </li>
@@ -364,6 +369,66 @@ export function RsmBadge({ size = 96, className = '' }: { size?: number; classNa
         RSM
       </text>
     </svg>
+  )
+}
+
+/**
+ * The featured credential's badge, falling back to the drawn RsmBadge mark
+ * for both a blank `src` and a path that 404s — same reasoning as
+ * ProductLogo below, so an unuploaded badge never shows a broken image.
+ */
+export function CertBadge({ src, alt, size = 86 }: { src?: string; alt: string; size?: number }) {
+  const [failed, setFailed] = useState(false)
+
+  if (!src || failed) return <RsmBadge size={size} className="shrink-0" />
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      width={size}
+      height={size}
+      style={{ width: size, height: size }}
+      className="shrink-0 object-contain"
+      onError={() => setFailed(true)}
+    />
+  )
+}
+
+/**
+ * Product logo with an initials fallback, covering both a blank `src` and a
+ * path that 404s. Logos can then be dropped into public/ one at a time
+ * without a broken-image icon sitting on the page in the meantime.
+ *
+ * The logo wall shows no product names any more, so the mark carries the
+ * label itself — `alt` is the name, not empty.
+ */
+export function ProductLogo({ src, name }: { src?: string; name: string }) {
+  const [failed, setFailed] = useState(false)
+
+  const words = name.trim().split(/\s+/)
+  /* Two words give their initials; one word gives its first two letters,
+     which beats a lone "G" sitting in the tile. */
+  const initials = (words.length > 1 ? words.slice(0, 2).map((w) => w[0]).join('') : name.slice(0, 2)).toUpperCase()
+
+  if (!src || failed) {
+    return (
+      <span className="flex h-full items-center justify-center rounded-xl bg-band px-3 text-lg font-extrabold text-navy">
+        {initials}
+      </span>
+    )
+  }
+
+  /* No width/height attributes: the logos range from 5:1 wordmarks to 1:1
+     square marks, so a fixed pair would fight the real aspect ratio. The
+     parent sets the bounding box and object-contain fits the mark inside it. */
+  return (
+    <img
+      src={src}
+      alt={name}
+      className="max-h-full w-auto max-w-full object-contain"
+      onError={() => setFailed(true)}
+    />
   )
 }
 
