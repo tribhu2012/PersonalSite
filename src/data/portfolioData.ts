@@ -30,7 +30,7 @@ export const navigation = [
   { label: 'About', href: '#about' },
   { label: 'Career', href: '#experience' },
   { label: 'My Work', href: '#projects' },
-  { label: 'Decisions', href: '#decisions' },
+  // { label: 'Decisions', href: '#decisions' },
   { label: 'Writing', href: '#writing' },
   { label: 'Skills', href: '#skills' },
   { label: 'Credentials', href: '#credentials' },
@@ -38,11 +38,12 @@ export const navigation = [
 ]
 
 /**
- * The floating pill nav splits around the centred name — three each side, so
- * it can't hold everything in `navigation`. Skills is the one left out: it's
- * the section a visitor is least likely to navigate to deliberately, and
- * "Decisions" is the one worth advertising. The full list still drives the
- * mobile menu and the footer, so nothing is unreachable.
+ * The floating pill nav splits around the centred name — three each side.
+ *
+ * When the Decisions section is restored, swap Skills out for
+ * `{ label: 'Decisions', href: '#decisions' }` — the pill only holds three a
+ * side, and Skills is the section a visitor is least likely to navigate to
+ * deliberately. It stays in the mobile menu and footer either way.
  */
 export const navGroups = {
   left: [
@@ -51,8 +52,8 @@ export const navGroups = {
     { label: 'My Work', href: '#projects' },
   ],
   right: [
-    { label: 'Decisions', href: '#decisions' },
     { label: 'Writing', href: '#writing' },
+    { label: 'Skills', href: '#skills' },
     { label: 'Contact', href: '#contact' },
   ],
 }

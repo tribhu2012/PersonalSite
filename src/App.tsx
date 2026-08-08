@@ -21,7 +21,7 @@ import {
   blog,
   caseStudy,
   credentials,
-  decisions,
+  // decisions,
   hero,
   interests,
   journey,
@@ -38,7 +38,7 @@ import {
   Badge,
   Card,
   Container,
-  DecisionReplay,
+  // DecisionReplay,
   Highlighted,
   LinkedinIcon,
   Loader,
@@ -588,7 +588,15 @@ function App() {
           )}
         </Screen>
 
-        {/* ── Make the call: the decision replay ────────────── */}
+        {/* ── Make the call: the decision replay ──────────────
+             Commented out until the rationale/cost lines in `decisions`
+             are rewritten in your own words — search "decisions" to
+             restore. The data and the DecisionReplay component are both
+             still in place; uncomment this block, the two imports above,
+             and the nav entries in portfolioData, then flip the four
+             sections below back to their other tone so the cream/slate
+             bands keep alternating.
+
         <Screen id="decisions" className="bg-band tint-bl">
           <Reveal>
             <SectionHeading title={decisions.heading} description={decisions.description} />
@@ -598,9 +606,10 @@ function App() {
             <DecisionReplay items={decisions.items} closing={decisions.closing} />
           </Reveal>
         </Screen>
+        ─────────────────────────────────────────────────────── */}
 
         {/* ── Writing ───────────────────────────────────────── */}
-        <Screen id="writing" className="tint-tr">
+        <Screen id="writing" className="bg-band tint-bl">
           <Reveal>
             <SectionHeading title="Thoughts from the build" description="Ideas, reflections, and insights from building products, leading teams, and solving complex problems." />
           </Reveal>
@@ -673,7 +682,7 @@ function App() {
         </Screen>
 
         {/* ── Skills ────────────────────────────────────────── */}
-        <Screen id="skills" className="bg-band tint-bl">
+        <Screen id="skills" className="tint-tr">
           <Reveal>
             <SectionHeading title="My Project Toolkit" description="The tools and practices I use to turn problems into meaningful products." />
           </Reveal>
@@ -707,7 +716,7 @@ function App() {
 
         {/* ── Certifications: one seal card each. Education lives on the
             Career road now, so it isn't repeated here. ─────────────── */}
-        <Screen id="credentials" className="tint-tr">
+        <Screen id="credentials" className="bg-band tint-bl">
           <Reveal>
             <SectionHeading title="Certifications" description="Professional certification and licensure." />
           </Reveal>
@@ -819,7 +828,7 @@ function App() {
         </Screen>
 
         {/* ── Publications & leadership ─────────────────────── */}
-        <Screen id="research" className="bg-band tint-bl">
+        <Screen id="research" className="tint-tr">
           <Reveal>
             <SectionHeading title="Publications and leadership" description="Peer-reviewed work and the communities I've helped run." />
           </Reveal>
