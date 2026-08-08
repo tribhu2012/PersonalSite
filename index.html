@@ -28,13 +28,13 @@
     />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Tribhuwan Bhatta" />
-    <meta property="og:url" content="http://tribhuwanb.com.np/" />
-    <!-- Served from the repo via jsDelivr, not from this domain. GitHub has
-         the domain's certificate stuck in `dns_changed`, so nothing here is
-         reachable over https, and scrapers refuse a plain-http image. Point
-         both image tags back at /og-cover.jpg once https works. -->
+    <!-- https, not http. The domain now redirects http → https, and a scraper
+         that reads a canonical URL which immediately redirects treats the
+         page as the wrong one and drops the card. -->
+    <meta property="og:url" content="https://tribhuwanb.com.np/" />
     <!-- prettier-ignore — kept on one line; some scrapers regex for it. -->
-    <meta property="og:image" content="https://cdn.jsdelivr.net/gh/tribhu2012/PersonalSite@main/public/og-cover.jpg" />
+    <meta property="og:image" content="https://tribhuwanb.com.np/og-cover.jpg" />
+    <meta property="og:image:secure_url" content="https://tribhuwanb.com.np/og-cover.jpg" />
     <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
@@ -47,9 +47,9 @@
       content="Project manager leading fintech product delivery across 12+ banking clients."
     />
     <!-- prettier-ignore -->
-    <meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/tribhu2012/PersonalSite@main/public/og-cover.jpg" />
+    <meta name="twitter:image" content="https://tribhuwanb.com.np/og-cover.jpg" />
 
-    <link rel="canonical" href="http://tribhuwanb.com.np/" />
+    <link rel="canonical" href="https://tribhuwanb.com.np/" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
