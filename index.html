@@ -2,7 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <!-- Circular portrait crop from the hero illustration. -->
+    <!-- Circular portrait crop from the hero illustration. The .ico is the
+         fallback for clients that only ever request /favicon.ico. -->
+    <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -16,13 +18,32 @@
       name="description"
       content="Project manager leading fintech product delivery across 12+ banking clients."
     />
-    <meta property="og:title" content="Tribhuwan Bhatta" />
+    <!-- Share cards. og:image must be absolute — scrapers don't resolve
+         relative paths. It's a screenshot of the hero; regenerate with
+         `npm run og` after the home screen changes. -->
+    <meta property="og:title" content="Tribhuwan Bhatta — Engineer & Project Manager" />
     <meta
       property="og:description"
       content="Project manager leading fintech product delivery across 12+ banking clients."
     />
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Tribhuwan Bhatta" />
+    <meta property="og:url" content="https://tribhuwanb.com.np/" />
+    <meta property="og:image" content="https://tribhuwanb.com.np/og-cover.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Tribhuwan Bhatta — Engineer & Project Manager" />
+
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Tribhuwan Bhatta — Engineer & Project Manager" />
+    <meta
+      name="twitter:description"
+      content="Project manager leading fintech product delivery across 12+ banking clients."
+    />
+    <meta name="twitter:image" content="https://tribhuwanb.com.np/og-cover.jpg" />
+
+    <link rel="canonical" href="https://tribhuwanb.com.np/" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
