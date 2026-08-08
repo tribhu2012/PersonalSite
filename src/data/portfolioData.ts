@@ -30,13 +30,20 @@ export const navigation = [
   { label: 'About', href: '#about' },
   { label: 'Career', href: '#experience' },
   { label: 'My Work', href: '#projects' },
+  { label: 'Decisions', href: '#decisions' },
   { label: 'Writing', href: '#writing' },
   { label: 'Skills', href: '#skills' },
   { label: 'Credentials', href: '#credentials' },
   { label: 'Contact', href: '#contact' },
 ]
 
-/** The floating pill nav splits around the centred name — three each side. */
+/**
+ * The floating pill nav splits around the centred name — three each side, so
+ * it can't hold everything in `navigation`. Skills is the one left out: it's
+ * the section a visitor is least likely to navigate to deliberately, and
+ * "Decisions" is the one worth advertising. The full list still drives the
+ * mobile menu and the footer, so nothing is unreachable.
+ */
 export const navGroups = {
   left: [
     { label: 'About', href: '#about' },
@@ -44,8 +51,8 @@ export const navGroups = {
     { label: 'My Work', href: '#projects' },
   ],
   right: [
+    { label: 'Decisions', href: '#decisions' },
     { label: 'Writing', href: '#writing' },
-    { label: 'Skills', href: '#skills' },
     { label: 'Contact', href: '#contact' },
   ],
 }
@@ -357,6 +364,164 @@ export const caseStudy = {
     ['Operational workload', '30% reduction'],
     ['Client response time', '50% faster'],
     ['Banking clients served', '12+'],
+  ],
+}
+
+/**
+ * "Make the call" — the decision replay.
+ *
+ * Each entry is a real fork from your delivery work: the situation, the
+ * options that were actually on the table, and what happened once you
+ * picked. The reader chooses before the answer is shown, so the section
+ * demonstrates judgement instead of asserting it.
+ *
+ * ⚠️ [CHECK] READ THIS BEFORE SHARING THE SITE.
+ * The situations and outcomes below are drawn from your CV and case study,
+ * so they're yours. The *reasoning* is not: `rationale` and `cost` were
+ * drafted from what the facts imply, not from anything you've said. Rewrite
+ * both in your own words. A hiring manager who asks "why not the rota?"
+ * will get your real answer, and it needs to match what's on the page.
+ *
+ * `chose` is the id of the option you took. Keep the rejected options
+ * genuinely tempting — a fork with one obvious answer says nothing about
+ * how you think. If an option is there to be dismissed, cut it.
+ */
+export const decisions = {
+  heading: 'Make the call',
+  description:
+    "Four forks from real projects. The constraints are what they were at the time — pick what you'd have done, then see what I did and what it cost.",
+  /** Shown once the reader has answered every fork. */
+  closing:
+    'Every one of these looked obvious in hindsight and none of them did at the time. That gap is most of the job.',
+  items: [
+    {
+      id: 'triage',
+      project: 'Live-Issue Management Pipeline',
+      org: 'CityTech Group',
+      year: '2024',
+      situation:
+        'Live issues from 12+ banking clients arrive over Viber, email and phone calls. Engineers are absorbing the coordination, and clients chase status because nobody can say where an issue stands.',
+      constraint: 'No budget for a service-desk tool, and the team is mid-sprint on a release.',
+      question: 'Where do you intervene?',
+      options: [
+        {
+          id: 'rota',
+          label: 'Put an engineer on a triage rota',
+          detail: 'One person on call each week so the rest keep their focus.',
+        },
+        {
+          id: 'form',
+          label: 'One intake form, and automate the handoffs',
+          detail: 'Every issue lands in one place and opens its own Jira ticket.',
+        },
+        {
+          id: 'lead',
+          label: 'Route everything through the team lead',
+          detail: 'A single owner for client communication and assignment.',
+        },
+      ],
+      chose: 'form',
+      rationale:
+        'A rota moves the interruption around rather than removing it — someone still retypes every Viber message into Jira. Routing through the lead concentrates that same manual work in the person with the least room to absorb it, and it collapses the week they take leave. Only the form removes the transcription step itself: the intake is the ticket.',
+      cost: 'Two weeks of alignment before a line of automation was written — settling who owns a ticket at each status, and persuading clients to give up the channel they liked. None of that effort shows up in the result.',
+      outcome: 'Operational workload down 30%, client response 50% faster, and a pipeline the team ran without me.',
+    },
+    {
+      id: 'pmo',
+      project: 'Establishing the PMO',
+      org: 'CityTech Group',
+      year: '2024',
+      situation:
+        'You are asked to stand up a PMO. Each delivery team already has its own way of running projects, and all of them work well enough that nobody feels broken.',
+      constraint: 'You have no mandate to enforce anything. You are their peer, not their manager.',
+      question: 'How do you start?',
+      options: [
+        {
+          id: 'standard',
+          label: 'Write the standard and require it',
+          detail: 'One documented way of working, adopted across every team at once.',
+        },
+        {
+          id: 'framework',
+          label: 'Adopt an established framework wholesale',
+          detail: 'Bring in a recognised methodology rather than inventing a local one.',
+        },
+        {
+          id: 'playbook',
+          label: 'Write playbooks teams can opt into, and prove it on one team',
+          detail: 'Make the good path the easy path, then let results do the arguing.',
+        },
+      ],
+      chose: 'playbook',
+      rationale:
+        'A standard I could not enforce would have been ignored politely, and the attempt would have spent the only credibility I had. A full framework answers questions this company had not asked yet — the cost lands immediately, the benefit much later. Opting in meant the first team had to want it, which made adoption evidence rather than compliance.',
+      cost: 'Months of visible inconsistency while teams moved at their own pace, and a stretch where it looked like nothing was happening. Leadership had to be told repeatedly that slow adoption was the plan.',
+      outcome: 'Consistent governance across delivery teams, with 6 interns onboarded straight into the model.',
+    },
+    {
+      id: 'testing',
+      project: 'Unified Testing Module',
+      org: 'CityTech Group',
+      year: '2025',
+      situation:
+        'Regression testing has to cover the whole product before each release, and there is no dedicated QA function to do it.',
+      constraint: 'The people testing are whoever is free that week, and they will not all be technical.',
+      question: 'What do you build?',
+      options: [
+        {
+          id: 'suite',
+          label: 'Write an automated test suite',
+          detail: 'The durable answer — machines run the regression, not people.',
+        },
+        {
+          id: 'ui',
+          label: 'Build a UI anyone can walk the product with',
+          detail: 'Test cases added as you go, and a bug ticket raised from any failed step.',
+        },
+        {
+          id: 'hire',
+          label: 'Make the case for a QA hire',
+          detail: 'Solve it with the right role instead of tooling around the gap.',
+        },
+      ],
+      chose: 'ui',
+      rationale:
+        'An automated suite is the better answer at volume, but it needs a stable UI and sustained engineering time, and the product was still moving underneath us — the suite would have spent its life being repaired. Arguing for a hire was a months-long conversation that left the next release untested either way. The UI was the option that worked the same week it shipped, for people who could not read a test script.',
+      cost: 'It scales with people, not machines. Every release still costs human hours, and at higher volume the automated suite becomes the right answer — this buys time rather than settling the question.',
+      outcome: 'Product-wide testing that a non-specialist can run unsupported, with tickets raised straight from failed steps.',
+    },
+    {
+      id: 'kpi',
+      project: 'Team KPI & Performance Reporting',
+      org: 'CityTech Group',
+      year: '2024',
+      situation:
+        'Leadership wants delivery data feeding HR evaluations and workforce planning. You are the one who can produce it, and the request is reasonable.',
+      constraint: 'The same numbers that improve planning can quietly punish the wrong people.',
+      question: 'What do you report?',
+      options: [
+        {
+          id: 'individual',
+          label: 'Per-person throughput',
+          detail: 'Tickets closed and velocity by name — exactly what was asked for.',
+        },
+        {
+          id: 'team',
+          label: 'Team-level outcomes, individuals left out',
+          detail: 'Report what the team delivered, not who moved which ticket.',
+        },
+        {
+          id: 'decline',
+          label: 'Decline the request',
+          detail: 'Keep delivery data out of evaluation entirely.',
+        },
+      ],
+      chose: 'team',
+      rationale:
+        'Per-person throughput is trivially gamed and penalises whoever takes the hard tickets — within a quarter people optimise for the count instead of the work. Declining outright would have meant planning carried on running on anecdote, which is worse and not mine to decide. Team-level reporting gave leadership the planning signal they actually needed while keeping a number out of a review where it would be read as a verdict.',
+      cost: 'It is not what was asked for, and I had to say so more than once. Some of those conversations got harder before they got easier.',
+      outcome: 'Workforce planning that runs on data rather than anecdote, without turning a dashboard into a performance review.',
+    },
   ],
 }
 

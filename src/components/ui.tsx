@@ -1,7 +1,21 @@
 import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from 'react'
 import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
-import { ClipboardList, Code2, Mail, MailCheck, Table2, TicketCheck, UserCheck, Zap } from 'lucide-react'
+import { AnimatePresence, motion } from 'framer-motion'
+import {
+  ArrowLeft,
+  ArrowRight,
+  CircleCheck,
+  ClipboardList,
+  Code2,
+  Lock,
+  Mail,
+  MailCheck,
+  RotateCcw,
+  Table2,
+  TicketCheck,
+  UserCheck,
+  Zap,
+} from 'lucide-react'
 
 type ButtonProps = {
   children: ReactNode
@@ -329,6 +343,240 @@ export function PipelineFlow({ stages }: { stages: PipelineStage[] }) {
         )
       })}
     </ol>
+  )
+}
+
+export type DecisionOption = { id: string; label: string; detail: string }
+
+export type Decision = {
+  id: string
+  project: string
+  org: string
+  year: string
+  situation: string
+  constraint: string
+  question: string
+  options: DecisionOption[]
+  chose: string
+  rationale: string
+  cost: string
+  outcome: string
+}
+
+/**
+ * "Make the call" — one fork at a time, answered before it's explained.
+ *
+ * The reader has to commit to an option before the reasoning unlocks. That
+ * ordering is the whole point: a rejected option you considered for a moment
+ * lands differently from one you were told about, which is what makes this
+ * read as judgement rather than a list of wins.
+ *
+ * Answers are kept per decision in `picks`, so moving back and forth doesn't
+ * re-lock a fork the reader has already opened.
+ */
+export function DecisionReplay({ items, closing }: { items: Decision[]; closing?: string }) {
+  const [index, setIndex] = useState(0)
+  const [picks, setPicks] = useState<Record<string, string>>({})
+
+  const current = items[index]
+  const picked = picks[current.id]
+  const answered = Boolean(picked)
+  const allAnswered = items.every((item) => picks[item.id])
+  const last = index === items.length - 1
+
+  const pad = (n: number) => String(n).padStart(2, '0')
+
+  return (
+    <div className="mx-auto w-full max-w-4xl">
+      {/* Progress. Answered forks fill in, so the row doubles as a place
+          marker and a nudge that there are more. Jumping straight to a fork
+          is allowed — they're independent, and forcing a march through them
+          would only strand anyone who came for one. */}
+      <div className="flex items-center justify-center gap-2">
+        {items.map((item, i) => {
+          const done = Boolean(picks[item.id])
+          const here = i === index
+
+          return (
+            <button
+              key={item.id}
+              onClick={() => setIndex(i)}
+              aria-label={`Decision ${i + 1}: ${item.project}`}
+              aria-current={here ? 'step' : undefined}
+              className={`h-2 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 ${
+                here ? 'w-8 bg-navy' : done ? 'w-2 bg-dot' : 'w-2 bg-slate-300 hover:bg-slate-400'
+              }`}
+            />
+          )
+        })}
+      </div>
+
+      <Card interactive={false} className="mt-6 p-6 sm:p-8">
+        <div className="flex items-baseline justify-between gap-3">
+          <span className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-dot">
+            {current.project}
+            <span className="mx-1.5 text-slate-300">/</span>
+            <span className="text-slate-500">{current.org}</span>
+          </span>
+          <span className="shrink-0 text-[13px] font-semibold text-slate-500">
+            {pad(index + 1)}
+            <span className="mx-1 text-slate-300">/</span>
+            {pad(items.length)}
+            <span className="mx-1.5 text-slate-300">·</span>
+            {current.year}
+          </span>
+        </div>
+
+        <p className="mt-4 text-[15px] leading-7 text-slate-700 sm:text-base sm:leading-8">{current.situation}</p>
+
+        {/* The constraint is what makes the fork hard, so it's pulled out of
+            the prose rather than buried at the end of it. */}
+        <p className="mt-4 flex items-start gap-2.5 rounded-2xl bg-band px-4 py-3 text-[13px] font-semibold leading-6 text-navy">
+          <Lock size={15} strokeWidth={2.4} className="mt-0.5 shrink-0 text-slate-400" />
+          {current.constraint}
+        </p>
+
+        <p className="mt-6 inline-block text-lg font-extrabold tracking-tight text-black">
+          <span className="swipe">{current.question}</span>
+        </p>
+
+        <div className="mt-4 space-y-2.5" role="group" aria-label={current.question}>
+          {current.options.map((option) => {
+            const mine = option.id === current.chose
+            const theirs = option.id === picked
+
+            // Before answering every option is live and identical — hinting
+            // at the answer with styling would give the fork away.
+            const state = !answered
+              ? 'border-slate-200 bg-white hover:-translate-y-0.5 hover:border-navy/30 hover:shadow-[0_10px_30px_rgba(15,23,42,0.08)]'
+              : mine
+                ? 'border-dot bg-dot/[0.06]'
+                : theirs
+                  ? 'border-slate-300 bg-white'
+                  : 'border-slate-200 bg-white opacity-55'
+
+            return (
+              <button
+                key={option.id}
+                onClick={() => !answered && setPicks((prev) => ({ ...prev, [current.id]: option.id }))}
+                disabled={answered}
+                aria-pressed={answered ? theirs : undefined}
+                className={`flex w-full items-start gap-3 rounded-2xl border-2 px-4 py-3.5 text-left transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 disabled:cursor-default ${state}`}
+              >
+                <span
+                  className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold transition-colors ${
+                    answered && mine ? 'bg-dot text-white' : 'border border-slate-300 text-navy'
+                  }`}
+                >
+                  {answered && mine ? <CircleCheck size={13} strokeWidth={3} /> : option.id === picked ? '·' : ''}
+                </span>
+
+                <span className="min-w-0 flex-1">
+                  {/* The verdict pill sits inside the text column and wraps
+                      rather than sitting in its own track — on a phone a fixed
+                      track squeezed every label onto three lines. */}
+                  <span className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1.5">
+                    <span className="text-[14px] font-bold leading-5 text-black">{option.label}</span>
+                    {answered && (mine || theirs) && (
+                      <span
+                        className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.08em] ${
+                          mine ? 'bg-dot text-white' : 'bg-slate-200 text-slate-600'
+                        }`}
+                      >
+                        {mine ? 'What I did' : 'Your call'}
+                      </span>
+                    )}
+                  </span>
+                  <span className="mt-1 block text-[13px] leading-6 text-slate-600">{option.detail}</span>
+                </span>
+              </button>
+            )
+          })}
+        </div>
+
+        <AnimatePresence initial={false}>
+          {answered && (
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, ease: 'easeOut' }}
+              className="mt-6 border-t border-dashed border-slate-300 pt-5"
+            >
+              {/* Announced on reveal — without this the answer appears silently
+                  for anyone not watching the screen. */}
+              <div aria-live="polite">
+                <p className="text-[13px] font-extrabold text-black">
+                  <span className="swipe">
+                    {picked === current.chose ? 'Same call' : 'I went the other way'}
+                  </span>
+                </p>
+                <p className="mt-2.5 text-[13px] leading-6 text-slate-600 sm:text-[14px] sm:leading-7">
+                  {current.rationale}
+                </p>
+
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  {/* The cost sits level with the outcome rather than under it.
+                      A choice shown only by what it won reads as a sales pitch. */}
+                  <div className="rounded-2xl bg-band px-4 py-3.5">
+                    <p className="text-[10px] font-extrabold uppercase tracking-[0.1em] text-slate-500">
+                      What it cost
+                    </p>
+                    <p className="mt-1.5 text-[13px] leading-6 text-navy">{current.cost}</p>
+                  </div>
+                  <div className="rounded-2xl bg-mint/25 px-4 py-3.5 ring-1 ring-mint">
+                    <p className="text-[10px] font-extrabold uppercase tracking-[0.1em] text-slate-500">
+                      What happened
+                    </p>
+                    <p className="mt-1.5 text-[13px] leading-6 text-navy">{current.outcome}</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <div className="mt-6 flex items-center justify-between gap-3 border-t border-slate-100 pt-5">
+          <button
+            onClick={() => setIndex((i) => Math.max(0, i - 1))}
+            disabled={index === 0}
+            className="inline-flex items-center gap-1.5 text-[13px] font-bold text-slate-600 transition-colors hover:text-black focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-0"
+          >
+            <ArrowLeft size={15} strokeWidth={2.5} /> Previous
+          </button>
+
+          {allAnswered && last ? (
+            <button
+              onClick={() => {
+                setPicks({})
+                setIndex(0)
+              }}
+              className="inline-flex items-center gap-1.5 text-[13px] font-bold text-slate-600 transition-colors hover:text-black focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+            >
+              <RotateCcw size={14} strokeWidth={2.5} /> Start over
+            </button>
+          ) : (
+            <button
+              onClick={() => setIndex((i) => Math.min(items.length - 1, i + 1))}
+              disabled={last}
+              className="inline-flex items-center gap-1.5 text-[13px] font-bold text-black transition-colors hover:text-dot focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-0"
+            >
+              {answered ? 'Next decision' : 'Skip'} <ArrowRight size={15} strokeWidth={2.5} />
+            </button>
+          )}
+        </div>
+      </Card>
+
+      {allAnswered && closing && (
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4, ease: 'easeOut' }}
+          className="mx-auto mt-5 max-w-2xl text-center text-[14px] font-semibold leading-7 text-slate-600"
+        >
+          {closing}
+        </motion.p>
+      )}
+    </div>
   )
 }
 

@@ -21,6 +21,7 @@ import {
   blog,
   caseStudy,
   credentials,
+  decisions,
   hero,
   interests,
   journey,
@@ -37,6 +38,7 @@ import {
   Badge,
   Card,
   Container,
+  DecisionReplay,
   Highlighted,
   LinkedinIcon,
   Loader,
@@ -586,8 +588,19 @@ function App() {
           )}
         </Screen>
 
+        {/* ── Make the call: the decision replay ────────────── */}
+        <Screen id="decisions" className="bg-band tint-bl">
+          <Reveal>
+            <SectionHeading title={decisions.heading} description={decisions.description} />
+          </Reveal>
+
+          <Reveal className="mt-8">
+            <DecisionReplay items={decisions.items} closing={decisions.closing} />
+          </Reveal>
+        </Screen>
+
         {/* ── Writing ───────────────────────────────────────── */}
-        <Screen id="writing" className="bg-band tint-bl">
+        <Screen id="writing" className="tint-tr">
           <Reveal>
             <SectionHeading title="Thoughts from the build" description="Ideas, reflections, and insights from building products, leading teams, and solving complex problems." />
           </Reveal>
@@ -660,7 +673,7 @@ function App() {
         </Screen>
 
         {/* ── Skills ────────────────────────────────────────── */}
-        <Screen id="skills" className="tint-tr">
+        <Screen id="skills" className="bg-band tint-bl">
           <Reveal>
             <SectionHeading title="My Project Toolkit" description="The tools and practices I use to turn problems into meaningful products." />
           </Reveal>
@@ -694,7 +707,7 @@ function App() {
 
         {/* ── Certifications: one seal card each. Education lives on the
             Career road now, so it isn't repeated here. ─────────────── */}
-        <Screen id="credentials" className="bg-band tint-bl">
+        <Screen id="credentials" className="tint-tr">
           <Reveal>
             <SectionHeading title="Certifications" description="Professional certification and licensure." />
           </Reveal>
@@ -806,7 +819,7 @@ function App() {
         </Screen>
 
         {/* ── Publications & leadership ─────────────────────── */}
-        <Screen id="research" className="tint-tr">
+        <Screen id="research" className="bg-band tint-bl">
           <Reveal>
             <SectionHeading title="Publications and leadership" description="Peer-reviewed work and the communities I've helped run." />
           </Reveal>
