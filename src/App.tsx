@@ -877,11 +877,8 @@ function App() {
                 Let&rsquo;s stay in touch
                 <span className="text-dot">.</span>
               </h2>
-              {/* UConn line commented out for now — original opener:
-                  "I’m starting my MS in Business Analytics and Project Management at UConn in Fall 2026, and" */}
               <p className="mx-auto mt-5 max-w-xl text-lg font-bold leading-8 text-slate-800">
-                I&rsquo;m always glad to talk delivery, automation, policy, governance, or whatever
-                you&rsquo;re building. Email is fastest, and I reply to everything.
+                I’m starting my MS in Business Analytics and Project Management at UConn in Fall 2026, and I&rsquo;m always glad to talk delivery, automation, policy, governance, or whatever you&rsquo;re building. Email is fastest, and I reply to everything.
               </p>
 
               <div className="mt-8 flex flex-wrap items-center justify-center gap-5">

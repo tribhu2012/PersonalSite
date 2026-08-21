@@ -10,9 +10,9 @@ import blogPosts from './blogPosts.json'
 export const profile = {
   name: 'Tribhuwan Bhatta',
   role: 'Engineer | Project Manager',
-  // location: 'Hartford, CT, USA',
-  location: 'Kathmandu, Nepal',
-  // availability: 'Incoming MS student at UConn',
+  location: 'Hartford, CT, USA',
+  // previous location: 'Kathmandu, Nepal',
+  availability: 'MS student at UConn School of Business, Fall 2026 — Incoming',
   email: 'tribhuwanbhatt7@gmail.com',
   phone: '+977-9869068078',
   linkedin: 'https://www.linkedin.com/in/tribbhatt/',
@@ -66,7 +66,7 @@ export const navGroups = {
 export const hero = {
   /** Two big lines, each closed with an accent dot. */
   headline: ['Hey', "I'm Tribhuwan"],
-  subtitle: ['Engineer & Project Manager' /*, 'Incoming MS student at UConn' */],
+  subtitle: ['Engineer & Project Manager', 'MS student at UConn School of Business'],
   image: '/hero.png',
   imageAlt: 'Illustration of Tribhuwan working at his laptop.',
   /**
@@ -101,9 +101,7 @@ export const about: { heading: string; body: ProseChunk[][] } = {
       "I'm passionate about improving how organisations operate: automating workflows across Jira and GitHub, establishing a Project Management Office from the ground up, mentoring early-career professionals. The through-line is building systems that are scalable, efficient, and driven by data.",
     ],
     [
-      /* UConn sentence removed for now — original:
-         '... public services. This fall I begin my MS in Business Analytics and Project Management at UConn. Always happy ...' */
-      'My interests span AI, digital transformation, fintech, and governance, particularly how evidence-based decision-making strengthens institutions and public services. Always happy to connect with people building technology that creates meaningful impact.',
+        "I'm starting my MS in Business Analytics and Project Management at UConn in Fall 2026, and my interests span AI, digital transformation, fintech, and governance, particularly how evidence-based decision-making strengthens institutions and public services. Always happy to connect with people building technology that creates meaningful impact.",
     ],
   ],
 }
@@ -140,13 +138,13 @@ export const journey = [
   /* Months abbreviated throughout: the road label is w-48 and the period
      renders uppercase with letter-spacing, so "September 2025" spelled out
      wraps onto a second line and pushes the title off its marker. */
-  { period: 'Jul 2023 — Apr 2024', title: 'R&D Intern', place: 'NSDevil, South Korea', kind: 'work' },
+  { period: 'Jul 2023 — Apr 2024', title: 'R&D Intern', place: 'NSDevil, South Korea (Remote)', kind: 'work' },
   { period: 'Jun 2024 — Jul 2026', title: 'Associate Project Manager', place: 'CityTech Group, Kathmandu', kind: 'work' },
   { period: 'Oct 2024 — Aug 2026', title: 'Faculty Member', place: 'SAIM College, Kathmandu', kind: 'work' },
   { period: 'Sep 2025 — Mar 2026', title: 'Faculty Member', place: 'Malpi International College, Kathmandu', kind: 'work' },
-  { period: 'Apr 2026 — Aug 2026', title: 'Product Lead, Nagarik Chautari', place: 'Office of the Prime Minister, Govt. of Nepal', kind: 'work' },
-  // { period: 'Fall 2026', title: 'MS Business Analytics & Project Management', place: 'University of Connecticut, Hartford', kind: 'study' },
-  // { period: 'Fall 2026', title: 'Graduate Research Assistant', place: 'Connecticut Transportation Institute, Storrs, CT', kind: 'work' },
+  { period: 'Apr 2026 — Aug 2026', title: 'Product Lead, Nagarik Chautari', place: 'Office of the Prime Minister and Council of Ministers, Government of Nepal', kind: 'work' },
+  { period: 'Aug 2026 - Present', title: 'MS in Business Analytics & Project Management', place: 'University of Connecticut, Hartford', kind: 'study' },
+  { period: 'Aug 2026 - Present', title: 'Graduate Research Assistant', place: 'Connecticut Transportation Institute, Mansfield', kind: 'work' },
 ]
 
 /**
@@ -298,6 +296,7 @@ export const projects = [
  */
 export const products: { name: string; logo?: string; url?: string }[] = [
   { name: 'GetPay', logo: '/getpay.webp', url: 'https://getpay.global' },
+  { name: 'iPay', logo: '/ipay.png', url: 'https://instantpay.co.tz' },
   { name: 'FinPOS', logo: '/finpos.svg', url: 'https://finpos.global' },
   /* [CHECK] The product is listed as FinPulse but the page is /finpro/ — if the
      product is actually called FinPro, rename it here and in the logo file. */
@@ -592,11 +591,11 @@ export const skills = [
  * swap in whatever you'd rather lead with.
  */
 export const interests = [
-  'Robotics & autonomous systems',
+  'E-governance',
   'AI in public policy',
+  'AI for business',
   'Teaching & mentoring',
   'Technical writing',
-  'Community building',
   'Product & early-stage startups',
 ]
 
@@ -629,12 +628,12 @@ type Certification = {
 
 export const credentials = {
   education: [
-    // {
-    //   degree: 'MS, Business Analytics and Project Management',
-    //   school: 'University of Connecticut, Hartford',
-    //   period: 'Fall 2026 — Incoming',
-    //   note: 'School of Business',
-    // },
+    {
+      degree: 'MS, Business Analytics and Project Management',
+      school: 'University of Connecticut, Hartford',
+      period: 'Fall 2026 — Incoming',
+      note: 'School of Business',
+    },
     {
       degree: 'BE, Electronics, Communication and Information Engineering',
       school: 'IOE, Pulchowk Campus',
@@ -674,7 +673,8 @@ export const credentials = {
        */
       logo: '/rsm-badge.png',
       /* Your words are better than mine here — edit freely. */
-      blurb: 'Sharpened how I deliver value iteratively, keep cross-functional teams aligned, and improve the process every sprint.',
+      blurb:
+        'Sharpened how I deliver value iteratively, keep cross-functional teams aligned, and improve the process every sprint. It underpins how I run delivery today — facilitating ceremonies across 12+ banking clients, and keeping engineers, QA and stakeholders working from one plan rather than three. The habit that stuck is the retrospective: most of the process changes I have shipped started as something someone raised in one.',
       tags: ['Agile & Delivery', 'Team Leadership', 'Scrum', 'Project Management'],
       year: '',
       url: '',
