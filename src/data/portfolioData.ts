@@ -13,7 +13,7 @@ export const profile = {
   location: 'Hartford, CT, USA',
   // previous location: 'Kathmandu, Nepal',
   availability: 'MS student at UConn School of Business, Fall 2026 — Incoming',
-  email: 'tribhuwanbhatt7@gmail.com',
+  email: 'tribbhatt7@gmail.com',
   phone: '+977-9869068078',
   linkedin: 'https://www.linkedin.com/in/tribbhatt/',
   github: 'https://github.com/Tribhuwan-Bhatta',
@@ -164,7 +164,7 @@ export const experience = [
       'Facilitate Scrum ceremonies, manage stakeholder communication, and coordinate cross-functional teams.',
     ],
     achievements: [
-      'Automated Jira and GitHub workflows and the live-issue pipeline — 30% less operational workload, 50% faster client response.',
+      'Automated Jira and GitHub workflows and the live-issue pipeline, 30% less operational workload, 50% faster client response.',
       'Established the PMO, authored project management playbooks, and mentored 6 interns.',
       'Built team KPI and performance reporting used for HR evaluations and workforce planning.',
     ],
@@ -674,7 +674,7 @@ export const credentials = {
       logo: '/rsm-badge.png',
       /* Your words are better than mine here — edit freely. */
       blurb:
-        'Sharpened how I deliver value iteratively, keep cross-functional teams aligned, and improve the process every sprint. It underpins how I run delivery today — facilitating ceremonies across 12+ banking clients, and keeping engineers, QA and stakeholders working from one plan rather than three. The habit that stuck is the retrospective: most of the process changes I have shipped started as something someone raised in one.',
+        'Sharpened how I deliver value iteratively, keep cross-functional teams aligned, and improve the process every sprint. It underpins how I run delivery today, facilitating ceremonies across 12+ banking clients, and keeping engineers, QA and stakeholders working from one plan rather than three. The habit that stuck is the retrospective: most of the process changes I have shipped started as something someone raised in one.',
       tags: ['Agile & Delivery', 'Team Leadership', 'Scrum', 'Project Management'],
       year: '',
       url: '',

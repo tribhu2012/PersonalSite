@@ -8,7 +8,6 @@ import {
   BriefcaseBusiness,
   CalendarDays,
   CircleCheck,
-  Download,
   GitBranch,
   GraduationCap,
   Mail,
@@ -217,9 +216,7 @@ function App() {
                   {item.label}
                 </a>
               ))}
-              <a href={profile.resumeUrl} target="_blank" rel="noreferrer" className="mt-2 flex items-center gap-2 rounded-xl bg-black px-3 py-2.5 text-[15px] font-semibold text-white" onClick={() => setMenuOpen(false)}>
-                <Download size={16} /> Download Resume
-              </a>
+              {/* CV download hidden for now */}
             </div>
           </div>
         )}
@@ -408,12 +405,7 @@ function App() {
             </div>
           </div>
 
-          {/* The detail that used to sit in these cards lives here now. */}
-          <div className="mt-7 flex justify-center">
-            <StickerButton href={profile.resumeUrl} tilt="-rotate-1">
-              Full history in my CV <Download size={16} />
-            </StickerButton>
-          </div>
+          {/* CV download hidden for now */}
         </Screen>
 
         {/* ── My work: two tabs, PM vs Development ──────────── */}
@@ -885,9 +877,7 @@ function App() {
                 <StickerButton href={`mailto:${profile.email}`} tilt="-rotate-2" variant="dark">
                   {profile.email}
                 </StickerButton>
-                <StickerButton href={profile.resumeUrl} tilt="rotate-1">
-                  Download Resume <Download size={16} />
-                </StickerButton>
+                {/* CV download hidden for now */}
               </div>
 
               <p className="mt-8 text-sm font-semibold text-slate-700">{profile.location}</p>
