@@ -56,7 +56,6 @@ import {
 
 const socialLinks = [
   { icon: LinkedinIcon, label: 'LinkedIn', href: profile.linkedin },
-  { icon: GitBranch, label: 'GitHub', href: profile.github },
   { icon: BookOpen, label: 'Medium', href: profile.medium },
   { icon: Mail, label: 'Email', href: `mailto:${profile.email}` },
 ]
