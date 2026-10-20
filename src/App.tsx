@@ -7,11 +7,17 @@ import {
   BookOpen,
   BriefcaseBusiness,
   CalendarDays,
+  ChevronLeft,
+  ChevronRight,
+  FileText,
+  Images,
+  MapPin,
   CircleCheck,
-  GitBranch,
+  Code,
   GraduationCap,
   Mail,
   Menu,
+  Sparkles,
   Star,
   X,
 } from 'lucide-react'
@@ -21,9 +27,11 @@ import {
   caseStudy,
   credentials,
   // decisions,
+  events,
   hero,
   interests,
   journey,
+  lab,
   linkedinPosts,
   navGroups,
   navigation,
@@ -33,12 +41,15 @@ import {
   skills,
   tools,
 } from './data/portfolioData'
+import type { LabStatus } from './data/portfolioData'
 import {
   Badge,
   Card,
   Container,
   // DecisionReplay,
+  GithubIcon,
   Highlighted,
+  Lightbox,
   LinkedinIcon,
   Loader,
   PinnedCard,
@@ -49,6 +60,7 @@ import {
   Reveal,
   CertBadge,
   Screen,
+  ScreenshotFrame,
   SectionHeading,
   StickerButton,
   StickyNote,
@@ -56,6 +68,7 @@ import {
 
 const socialLinks = [
   { icon: LinkedinIcon, label: 'LinkedIn', href: profile.linkedin },
+  { icon: GithubIcon, label: 'GitHub', href: profile.github },
   { icon: BookOpen, label: 'Medium', href: profile.medium },
   { icon: Mail, label: 'Email', href: `mailto:${profile.email}` },
 ]
@@ -126,6 +139,23 @@ function useNavScroll() {
   return { compact, hidden }
 }
 
+const LAB_STATUS: Record<LabStatus, { label: string; className: string; dot: string }> = {
+  live: { label: 'Live', className: 'bg-emerald-50 text-emerald-700 ring-emerald-200', dot: 'bg-emerald-500' },
+  complete: { label: 'Completed', className: 'bg-sky-50 text-sky-700 ring-sky-200', dot: 'bg-sky-500' },
+  building: { label: 'In progress', className: 'bg-amber-50 text-amber-800 ring-amber-200', dot: 'bg-amber-500' },
+  upcoming: { label: 'Upcoming', className: 'bg-slate-100 text-slate-600 ring-slate-200', dot: 'bg-slate-400' },
+}
+
+function LabStatusPill({ status }: { status: LabStatus }) {
+  const s = LAB_STATUS[status]
+  return (
+    <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-bold ring-1 ${s.className}`}>
+      <span aria-hidden="true" className={`h-1.5 w-1.5 rounded-full ${s.dot}`} />
+      {s.label}
+    </span>
+  )
+}
+
 function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const { compact, hidden } = useNavScroll()
@@ -133,6 +163,12 @@ function App() {
   // The pinned panel renders `featured`; the scroll list gets the rest.
   const featuredProject = projects.find((project) => project.featured)
   const shownProjects = projects.filter((project) => !project.featured)
+  const hasUpcoming = lab.some((item) => item.status === 'upcoming')
+  const [labIndex, setLabIndex] = useState(0)
+  const labStep = (d: number) => setLabIndex((i) => (i + d + lab.length) % lab.length)
+  const labTouchX = useRef<number | null>(null)
+  const [eventView, setEventView] = useState<{ event: number; photo: number } | null>(null)
+  const viewedEvent = eventView ? events[eventView.event] : null
 
   const featuredCert = credentials.certifications.find((cert) => cert.featured)
   const otherCerts = credentials.certifications.filter((cert) => !cert.featured)
@@ -175,7 +211,7 @@ function App() {
             compact ? 'max-w-3xl px-4 py-2 sm:px-5' : 'max-w-5xl px-5 py-3 sm:px-7'
           }`}
         >
-          <nav className="hidden flex-1 items-center gap-6 text-[15px] font-semibold text-slate-800 lg:flex" aria-label="Primary navigation">
+          <nav className="hidden flex-1 items-center gap-5 text-[15px] font-semibold text-slate-800 lg:flex" aria-label="Primary navigation">
             {navGroups.left.map((item) => (
               <a key={item.href} href={item.href} className="transition-colors hover:text-dot focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">
                 {item.label}
@@ -194,7 +230,7 @@ function App() {
             {compact ? 'TB' : profile.name}
           </a>
 
-          <nav className="hidden flex-1 items-center justify-end gap-6 text-[15px] font-semibold text-slate-800 lg:flex" aria-label="Secondary navigation">
+          <nav className="hidden flex-1 items-center justify-end gap-5 text-[15px] font-semibold text-slate-800 lg:flex" aria-label="Secondary navigation">
             {navGroups.right.map((item) => (
               <a key={item.href} href={item.href} className="transition-colors hover:text-dot focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">
                 {item.label}
@@ -579,6 +615,136 @@ function App() {
           )}
         </Screen>
 
+        {/* ── In the lab: side projects, live and upcoming ───── */}
+        <Screen id="lab" className="bg-band tint-bl">
+          <Reveal>
+            <SectionHeading
+              title="In the lab"
+              description="Things I build on my own time: what's working now, and what's coming next."
+            />
+          </Reveal>
+
+          {/* One build at a time. Tabs name every build (and end with a dashed
+              "Next up" chip until an upcoming one is listed); arrows and swipe
+              step through. All slides share one grid cell, so the card keeps
+              the height of the tallest and nothing jumps when you switch. */}
+          <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex min-w-0 gap-2 overflow-x-auto pb-1 [scrollbar-width:none]" role="tablist" aria-label="Lab projects">
+              {lab.map((item, i) => (
+                <button
+                  key={item.title}
+                  type="button"
+                  role="tab"
+                  aria-selected={i === labIndex}
+                  onClick={() => setLabIndex(i)}
+                  className={`inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-[13.5px] font-bold transition ${
+                    i === labIndex
+                      ? 'bg-black text-white'
+                      : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:text-black hover:ring-slate-300'
+                  }`}
+                >
+                  <span className={`text-[11px] ${i === labIndex ? 'text-mint' : 'text-slate-400'}`}>{String(i + 1).padStart(2, '0')}</span>
+                  {item.title}
+                </button>
+              ))}
+              {!hasUpcoming && (
+                <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border-2 border-dashed border-slate-300 px-4 py-1.5 text-[13.5px] font-semibold text-slate-500">
+                  <Sparkles size={14} className="text-dot" /> Next up
+                </span>
+              )}
+            </div>
+
+            {lab.length > 1 && (
+              <div className="flex items-center gap-2">
+                <span className="mr-1 text-[13px] font-semibold tabular-nums text-slate-500">
+                  {labIndex + 1} / {lab.length}
+                </span>
+                <button type="button" onClick={() => labStep(-1)} aria-label="Previous project" className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-black ring-1 ring-slate-200 transition hover:bg-black hover:text-white">
+                  <ChevronLeft size={18} />
+                </button>
+                <button type="button" onClick={() => labStep(1)} aria-label="Next project" className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-black ring-1 ring-slate-200 transition hover:bg-black hover:text-white">
+                  <ChevronRight size={18} />
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div
+            className="mt-4 grid"
+            onTouchStart={(e) => { labTouchX.current = e.touches[0].clientX }}
+            onTouchEnd={(e) => {
+              if (labTouchX.current === null) return
+              const dx = e.changedTouches[0].clientX - labTouchX.current
+              if (Math.abs(dx) > 50) labStep(dx < 0 ? 1 : -1)
+              labTouchX.current = null
+            }}
+          >
+            {lab.map((item, i) => {
+              const active = i === labIndex
+              return (
+                <div
+                  key={item.title}
+                  aria-hidden={!active}
+                  inert={!active}
+                  className={`col-start-1 row-start-1 transition duration-300 ease-out ${
+                    active ? 'translate-x-0 opacity-100' : `pointer-events-none invisible opacity-0 ${i < labIndex ? '-translate-x-6' : 'translate-x-6'}`
+                  }`}
+                >
+                  <Card
+                    interactive={false}
+                    className={`grid h-full gap-7 overflow-hidden p-5 sm:p-6 ${item.images?.length ? 'lg:grid-cols-[1.2fr_1fr] lg:items-center' : ''}`}
+                  >
+                    {item.images?.length ? <ScreenshotFrame shots={item.images} alt={item.title} /> : null}
+
+                    <div className="flex flex-col">
+                      <div className="flex items-center justify-between gap-3">
+                        <LabStatusPill status={item.status} />
+                        {item.year && <span className="text-[13px] font-semibold text-slate-500">{item.year}</span>}
+                      </div>
+                      <h3 className="mt-3 text-2xl font-extrabold leading-tight tracking-tight text-black">{item.title}</h3>
+                      {item.tagline && <p className="mt-1 text-[14px] font-semibold text-navy">{item.tagline}</p>}
+                      <p className="mt-3 text-[14px] leading-[1.65] text-slate-600">{item.description}</p>
+
+                      {item.points && (
+                        <ul className="mt-4 space-y-2">
+                          {item.points.map((point) => (
+                            <li key={point} className="flex gap-2.5 text-[13.5px] leading-5 text-slate-700">
+                              <CircleCheck size={16} className="mt-0.5 shrink-0 text-dot" />
+                              {point}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+
+                      {item.technologies && (
+                        <div className="mt-5 flex flex-wrap gap-1.5">
+                          {item.technologies.map((tech) => <Badge key={tech}>{tech}</Badge>)}
+                        </div>
+                      )}
+
+                      {(item.repo || item.demo) && (
+                        <div className="mt-5 flex flex-wrap gap-4 border-t border-slate-100 pt-4">
+                          {item.demo && (
+                            <a href={item.demo} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-[14px] font-bold text-black hover:text-link">
+                              Try it <ArrowUpRight size={16} />
+                            </a>
+                          )}
+                          {item.repo && (
+                            <a href={item.repo} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-[14px] font-bold text-black hover:text-link">
+                              {item.repoLabel ? <FileText size={16} /> : <Code size={16} />}
+                              {item.repoLabel ?? 'View the code'} <ArrowUpRight size={16} />
+                            </a>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </Card>
+                </div>
+              )
+            })}
+          </div>
+        </Screen>
+
         {/* ── Make the call: the decision replay ──────────────
              Commented out until the rationale/cost lines in `decisions`
              are rewritten in your own words — search "decisions" to
@@ -586,9 +752,10 @@ function App() {
              still in place; uncomment this block, the two imports above,
              and the nav entries in portfolioData, then flip the four
              sections below back to their other tone so the cream/slate
-             bands keep alternating.
+             bands keep alternating. The lab above is a slate band, so this
+             one takes the cream tone.
 
-        <Screen id="decisions" className="bg-band tint-bl">
+        <Screen id="decisions" className="tint-tr">
           <Reveal>
             <SectionHeading title={decisions.heading} description={decisions.description} />
           </Reveal>
@@ -600,7 +767,7 @@ function App() {
         ─────────────────────────────────────────────────────── */}
 
         {/* ── Writing ───────────────────────────────────────── */}
-        <Screen id="writing" className="bg-band tint-bl">
+        <Screen id="writing" className="tint-tr">
           <Reveal>
             <SectionHeading title="Thoughts from the build" description="Ideas, reflections, and insights from building products, leading teams, and solving complex problems." />
           </Reveal>
@@ -673,7 +840,7 @@ function App() {
         </Screen>
 
         {/* ── Skills ────────────────────────────────────────── */}
-        <Screen id="skills" className="tint-tr">
+        <Screen id="skills" className="bg-band tint-bl">
           <Reveal>
             <SectionHeading title="My Project Toolkit" description="The tools and practices I use to turn problems into meaningful products." />
           </Reveal>
@@ -707,7 +874,7 @@ function App() {
 
         {/* ── Certifications: one seal card each. Education lives on the
             Career road now, so it isn't repeated here. ─────────────── */}
-        <Screen id="credentials" className="bg-band tint-bl">
+        <Screen id="credentials" className="tint-tr">
           <Reveal>
             <SectionHeading title="Certifications" description="Professional certification and licensure." />
           </Reveal>
@@ -819,7 +986,7 @@ function App() {
         </Screen>
 
         {/* ── Publications & leadership ─────────────────────── */}
-        <Screen id="research" className="tint-tr">
+        <Screen id="research" className="bg-band tint-bl">
           <Reveal>
             <SectionHeading title="Publications and leadership" description="Peer-reviewed work and the communities I've helped run." />
           </Reveal>
@@ -858,6 +1025,72 @@ function App() {
               </Card>
             </Reveal>
           </div>
+        </Screen>
+
+        {/* ── Recent events: photo-led, opens a full-screen viewer ── */}
+        <Screen id="events" className="tint-tr">
+          <Reveal>
+            <SectionHeading title="Recent events" description="Conferences, meetups and workshops I've been part of." />
+          </Reveal>
+
+          {events.length === 0 && (
+            <Reveal>
+              <div className="mx-auto mt-8 flex max-w-2xl flex-col items-center rounded-3xl border-2 border-dashed border-slate-300 px-6 py-10 text-center">
+                <Images size={26} className="text-dot" />
+                <p className="mt-3 text-[16px] font-extrabold text-black">Photos coming soon</p>
+                <p className="mt-1 text-[14px] leading-6 text-slate-500">Moments from conferences, meetups and workshops will land here.</p>
+              </div>
+            </Reveal>
+          )}
+
+          <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {events.map((event, i) => (
+              <Reveal key={`${event.title}-${event.date}`}>
+                <Card className="flex h-full flex-col overflow-hidden p-0">
+                  <button
+                    type="button"
+                    onClick={() => setEventView({ event: i, photo: 0 })}
+                    aria-label={`Open photos from ${event.title}`}
+                    className="relative block aspect-[4/3] w-full overflow-hidden bg-slate-100"
+                  >
+                    <img
+                      src={event.photos[0]}
+                      alt=""
+                      loading="lazy"
+                      className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                    />
+                    {event.photos.length > 1 && (
+                      <span className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full bg-black/60 px-2.5 py-1 text-[12px] font-semibold text-white backdrop-blur">
+                        <Images size={14} /> {event.photos.length}
+                      </span>
+                    )}
+                    {event.role && (
+                      <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-[12px] font-bold text-black backdrop-blur">
+                        {event.role}
+                      </span>
+                    )}
+                  </button>
+                  <div className="flex flex-1 flex-col p-5">
+                    <p className="flex items-center justify-between gap-3 text-[12.5px] font-semibold text-slate-500">
+                      <span className="inline-flex items-center gap-1"><CalendarDays size={14} /> {event.date}</span>
+                      {event.location && <span className="inline-flex min-w-0 items-center gap-1"><MapPin size={14} className="shrink-0" /> <span className="truncate">{event.location}</span></span>}
+                    </p>
+                    {/* Fixed shape so every card matches: one-line title, three-line description. */}
+                    <h3 className="mt-2 truncate text-lg font-extrabold leading-snug tracking-tight text-black" title={event.title}>{event.title}</h3>
+                    <p className="mt-1.5 line-clamp-3 min-h-18 text-[13px] leading-6 text-slate-600">{event.description}</p>
+                  </div>
+                </Card>
+              </Reveal>
+            ))}
+          </div>
+
+          <Lightbox
+            photos={viewedEvent?.photos ?? []}
+            index={eventView?.photo ?? null}
+            title={viewedEvent?.title ?? ''}
+            onIndex={(photo) => eventView && setEventView({ ...eventView, photo })}
+            onClose={() => setEventView(null)}
+          />
         </Screen>
 
         {/* ── Contact ───────────────────────────────────────── */}

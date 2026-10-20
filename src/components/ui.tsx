@@ -1,5 +1,6 @@
 import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from 'react'
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
   ArrowLeft,
@@ -14,6 +15,7 @@ import {
   Table2,
   TicketCheck,
   UserCheck,
+  X,
   Zap,
 } from 'lucide-react'
 
@@ -136,6 +138,15 @@ export function LinkedinIcon({ size = 18, className = '' }: { size?: number; cla
       className={className}
     >
       <path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zm1.78 13.02H3.55V9h3.57v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.22.79 24 1.77 24h20.45c.98 0 1.78-.78 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z" />
+    </svg>
+  )
+}
+
+/** GitHub mark, same API as LinkedinIcon (lucide no longer ships brand icons). */
+export function GithubIcon({ size = 18, className = '' }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className={className}>
+      <path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.07 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3" />
     </svg>
   )
 }
@@ -695,5 +706,132 @@ export function Reveal({ children, className = '' }: { children: ReactNode; clas
     >
       {children}
     </motion.div>
+  )
+}
+
+/**
+ * Screenshots in a browser frame, so they read as a product rather than a
+ * picture. With more than one shot, the frame's top bar carries a tab each.
+ */
+export function ScreenshotFrame({ shots, alt }: { shots: { src: string; label: string }[]; alt: string }) {
+  const [active, setActive] = useState(0)
+  const shot = shots[active] ?? shots[0]
+
+  return (
+    <div className="overflow-hidden rounded-2xl bg-white shadow-[0_10px_30px_rgba(15,23,42,0.08)] ring-1 ring-navy/10">
+      <div className="flex items-center gap-1.5 border-b border-slate-100 bg-slate-50 px-3.5 py-2">
+        <span aria-hidden="true" className="h-2.5 w-2.5 shrink-0 rounded-full bg-[#ff6159]" />
+        <span aria-hidden="true" className="h-2.5 w-2.5 shrink-0 rounded-full bg-[#ffbd2e]" />
+        <span aria-hidden="true" className="h-2.5 w-2.5 shrink-0 rounded-full bg-[#28c941]" />
+        {shots.length > 1 && (
+          <div className="ml-3 flex min-w-0 gap-1 overflow-x-auto" role="tablist" aria-label={`${alt} screenshots`}>
+            {shots.map((s, i) => (
+              <button
+                key={s.src}
+                type="button"
+                role="tab"
+                aria-selected={i === active}
+                onClick={() => setActive(i)}
+                className={`shrink-0 rounded-md px-2.5 py-0.5 text-[12px] font-semibold transition ${
+                  i === active ? 'bg-white text-black shadow-sm ring-1 ring-slate-200' : 'text-slate-500 hover:text-black'
+                }`}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+      <img src={shot.src} alt={`${alt}: ${shot.label}`} loading="lazy" className="block aspect-[16/9] w-full object-cover object-top" />
+    </div>
+  )
+}
+
+/**
+ * Full-screen photo viewer. Arrow keys step through, Escape or a click on the
+ * backdrop closes. `index` null means closed.
+ */
+export function Lightbox({
+  photos,
+  index,
+  title,
+  onIndex,
+  onClose,
+}: {
+  photos: string[]
+  index: number | null
+  title: string
+  onIndex: (i: number) => void
+  onClose: () => void
+}) {
+  const open = index !== null
+  const step = (d: number) => index !== null && onIndex((index + d + photos.length) % photos.length)
+
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+      if (e.key === 'ArrowRight') step(1)
+      if (e.key === 'ArrowLeft') step(-1)
+    }
+    const overflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    window.addEventListener('keydown', onKey)
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      document.body.style.overflow = overflow
+    }
+  })
+
+  const navButton =
+    'absolute top-1/2 -translate-y-1/2 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur transition hover:bg-white/25'
+
+  // Portalled to <body> so no section's stacking context can sit above it.
+  return createPortal(
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-slate-950/95 p-4 sm:p-10"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose}
+          role="dialog"
+          aria-modal="true"
+          aria-label={title}
+        >
+          <button type="button" onClick={onClose} aria-label="Close" className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/25">
+            <X size={22} />
+          </button>
+
+          <motion.img
+            key={photos[index]}
+            src={photos[index]}
+            alt={`${title}, photo ${index + 1} of ${photos.length}`}
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.2 }}
+            onClick={(e) => e.stopPropagation()}
+            className="max-h-[80vh] max-w-full rounded-xl object-contain shadow-2xl"
+          />
+          <p className="mt-4 text-center text-[14px] text-white/80">
+            <span className="font-bold text-white">{title}</span>
+            {photos.length > 1 && <span className="ml-2">{index + 1} / {photos.length}</span>}
+          </p>
+
+          {photos.length > 1 && (
+            <>
+              <button type="button" aria-label="Previous photo" className={`${navButton} left-3 sm:left-6`} onClick={(e) => { e.stopPropagation(); step(-1) }}>
+                <ArrowLeft size={20} />
+              </button>
+              <button type="button" aria-label="Next photo" className={`${navButton} right-3 sm:right-6`} onClick={(e) => { e.stopPropagation(); step(1) }}>
+                <ArrowRight size={20} />
+              </button>
+            </>
+          )}
+        </motion.div>
+      )}
+    </AnimatePresence>,
+    document.body,
   )
 }

@@ -16,7 +16,7 @@ export const profile = {
   email: 'tribbhatt7@gmail.com',
   phone: '+977-9869068078',
   linkedin: 'https://www.linkedin.com/in/tribbhatt/',
-  github: 'https://github.com/Tribhuwan-Bhatta',
+  github: 'https://github.com/tribhu2012',
   medium: 'https://medium.com/@tribhuwanbhatt7',
   resumeUrl: '/Tribhuwan-Bhatta-CV.pdf',
 }
@@ -30,6 +30,8 @@ export const navigation = [
   { label: 'About', href: '#about' },
   { label: 'Career', href: '#experience' },
   { label: 'My Work', href: '#projects' },
+  { label: 'Lab', href: '#lab' },
+  { label: 'Events', href: '#events' },
   // { label: 'Decisions', href: '#decisions' },
   { label: 'Writing', href: '#writing' },
   { label: 'Skills', href: '#skills' },
@@ -50,9 +52,11 @@ export const navGroups = {
     { label: 'About', href: '#about' },
     { label: 'Career', href: '#experience' },
     { label: 'My Work', href: '#projects' },
+    { label: 'Lab', href: '#lab' },
   ],
   right: [
     { label: 'Writing', href: '#writing' },
+    { label: 'Events', href: '#events' },
     { label: 'Skills', href: '#skills' },
     { label: 'Contact', href: '#contact' },
   ],
@@ -315,6 +319,139 @@ export const products: { name: string; logo?: string; url?: string }[] = [
 export const workTabs = [
   { id: 'pm', label: 'Project Management' },
   { id: 'dev', label: 'Development' },
+]
+
+/**
+ * "In the lab" — things I build on my own time, shipped or still coming.
+ *
+ * `status`: 'live' (usable now), 'complete' (finished, nothing to visit),
+ * 'building' (working, still in progress), 'upcoming' (planned). The first
+ * entry with `images` renders as the large showcase card; every other entry
+ * sits in the grid below it. An upcoming entry only needs `title`, `status`
+ * and `description`.
+ *
+ * `images` are paths under public/. With more than one, the screenshot frame
+ * gets a tab per image, labelled by `label`.
+ *
+ * `repo` is the main link; it reads "View the code" unless `repoLabel` says
+ * otherwise (e.g. when it points at a file rather than source code).
+ *
+ * Until an upcoming entry exists, the grid ends with a "Next up" tile, so the
+ * section reads as ongoing rather than finished.
+ */
+export type LabStatus = 'live' | 'complete' | 'building' | 'upcoming'
+
+export const lab: {
+  title: string
+  tagline?: string
+  status: LabStatus
+  year?: string
+  description: string
+  points?: string[]
+  technologies?: string[]
+  images?: { src: string; label: string }[]
+  repo?: string
+  repoLabel?: string
+  demo?: string
+}[] = [
+  {
+    title: 'ProjectPulse',
+    tagline: 'PMO and agile analytics, built for stakeholders who skim',
+    status: 'building',
+    year: '2026',
+    description:
+      'A portfolio management platform that sits on Jira-style data. Executives see health, budget and risk at a glance; PMs and scrum masters drill into velocity, workload and delivery. A model predicts which projects will finish late, and explains why.',
+    points: [
+      'Earned value, health scoring and risk exposure, replayable as of any date',
+      'Delay-probability model with what-if explanations',
+      'Every page opens with the answer: a one-line headline, then four KPIs',
+    ],
+    technologies: ['Python', 'Streamlit', 'PostgreSQL', 'scikit-learn', 'Plotly'],
+    images: [{ src: '/projectpulse.webp', label: 'Executive dashboard' }],
+    repo: 'https://github.com/tribhu2012/PMO-System',
+  },
+  {
+    title: 'E-Commerce Sales Analytics',
+    tagline: 'A two-page Power BI report on 1.07M retail transactions',
+    status: 'complete',
+    year: '2026',
+    description:
+      'Two years of online-retail transactions (2009–2011) turned into an executive summary and a product deep-dive: revenue, orders and customers against the prior year, trends by month and weekday, and which products and price bands carry the business.',
+    technologies: ['Power BI', 'DAX', 'Power Query', 'Excel'],
+    images: [
+      { src: '/ecommerce-summary.webp', label: 'Executive summary' },
+      { src: '/ecommerce-products.webp', label: 'Product performance' },
+    ],
+    repo: 'https://github.com/tribhu2012/PowerBI_Projects/blob/main/Ecommerce%20Analytics/EcommerceAnalytics.pbix',
+    repoLabel: 'View the Power BI file',
+  },
+  /* Upcoming projects go here, e.g.
+  {
+    title: 'Next project',
+    status: 'upcoming',
+    description: 'One or two sentences on what it is and who it is for.',
+    technologies: ['…'],
+  },
+  */
+]
+
+/**
+ * "Recent events" — conferences, meetups and workshops, newest first.
+ *
+ * Put each event's photos in their own folder under public/events/ (e.g.
+ * public/events/pmi-summit-2026/01.webp) and list them in `photos`; the first
+ * is the cover. Photos open in a full-screen viewer. Landscape shots around
+ * 1600px wide in .webp keep the page fast.
+ *
+ * While this array is empty the section shows a "coming soon" placeholder.
+ */
+export const events: {
+  /** Keep it short: cards show one line and cut off the rest. */
+  title: string
+  /** Month and year only, e.g. 'Sep 2026'. */
+  date: string
+  /** City, state, e.g. 'Hartford, CT'. */
+  location?: string
+  /** What you did there: 'Speaker', 'Organiser', 'Attendee'… */
+  role?: string
+  description?: string
+  photos: string[]
+}[] = [
+  {
+    title: 'Visit to the NYSE',
+    date: 'Oct 2026',
+    location: 'New York, NY',
+    description: 'Visited the New York Stock Exchange with UConn, then walked Wall Street to the Charging Bull.',
+    photos: ['/events/nyse.jpeg', '/events/wallstreet.JPG'],
+  },
+  {
+    title: 'Hack for Humanity',
+    date: 'Sep 2026',
+    /* [CHECK] UConn School of Business campus — change if it wasn't Hartford. */
+    location: 'Hartford, CT',
+    role: 'Second place',
+    description: 'Built a tool that helps anyone in Connecticut find food, housing and healthcare in under a minute.',
+    photos: ['/events/hackforhumanityrunnerup.jpeg'],
+  },
+  {
+    /* [CHECK] Month is inferred from the New Year 2083 banner in the photo. */
+    title: 'RSM Certification Training',
+    date: 'Apr 2026',
+    location: 'Lalitpur, Nepal',
+    role: 'Certified',
+    description: 'Completed two days of Registered Scrum Master™ training, then passed the exam to earn the certification.',
+    photos: ['/events/rsm.jpeg'],
+  },
+  /* Example:
+  {
+    title: 'Event name',
+    date: 'Sep 2026',
+    location: 'Hartford, CT',
+    role: 'Speaker',
+    description: 'About 100 characters, so it fits three lines without being cut.',
+    photos: ['/events/event-name/01.webp', '/events/event-name/02.webp'],
+  },
+  */
 ]
 
 /** The strongest story to tell at length — expand this as you gather detail. */
